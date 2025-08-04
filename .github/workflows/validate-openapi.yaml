@@ -9,9 +9,30 @@ on:
       - main
 
 jobs:
-  validate-openapi:
+  detect-openapi-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      specs_changed: ${{ steps.specs_changed.outputs.SPECS_CHANGED }}
+    steps:
+      - name: Check if specs where changed
+        id: specs_changed
+        run: |
+          if git diff --quiet main -- openapi/; then
+            SPECS_CHANGED=true
+          else 
+            SPECS_CHANGED=false
+          fi
+
+  lint-openapi:
+    needs: detect-openapi-changes
     runs-on: ubuntu-latest
     steps:
+      - name: Exit early if no changes
+        run: |
+          if [[ "${{ needs.detect-openapi-changes.outputs.specs_changed }}" != "true" ]]; then
+            echo "No OpenAPI changes. Skipping lint."
+            exit 0
+          fi
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
       - uses: pnpm/action-setup@v3
