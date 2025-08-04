@@ -117,9 +117,15 @@ components:
           description: A public name for the account. This should be set by the account holder with their provider to provide a hint to counterparties as to the identity of the account holder.
           readOnly: true
         assetCode:
-          $ref: ./schemas.yaml#/components/schemas/assetCode
+          title: Asset code
+          type: string
+          description: The assetCode is a code that indicates the underlying asset. This SHOULD be an ISO4217 currency code.
         assetScale:
-          $ref: ./schemas.yaml#/components/schemas/assetScale
+          title: Asset scale
+          type: integer
+          minimum: 0
+          maximum: 255
+          description: The scale of amounts denoted in the corresponding asset code.
         authServer:
           type: string
           format: uri
