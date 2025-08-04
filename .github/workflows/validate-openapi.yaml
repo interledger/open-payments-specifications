@@ -9,36 +9,23 @@ on:
       - main
 
 jobs:
-  detect-openapi-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      specs_changed: ${{ steps.specs_changed.outputs.SPECS_CHANGED }}
-    steps:
-      - name: Check if specs where changed
-        id: specs_changed
-        run: |
-          if git diff --quiet main -- openapi/; then
-            SPECS_CHANGED=true
-          else 
-            SPECS_CHANGED=false
-          fi
-
   lint-openapi:
-    needs: detect-openapi-changes
     runs-on: ubuntu-latest
     steps:
-      - name: Exit early if no changes
-        run: |
-          if [[ "${{ needs.detect-openapi-changes.outputs.specs_changed }}" != "true" ]]; then
-            echo "No OpenAPI changes. Skipping lint."
-            exit 0
-          fi
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v2
       - uses: pnpm/action-setup@v3
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       - name: Validate OpenAPI specs
-        run: pnpm lint:openapi
+        run: |
+          if git diff --quiet origin/main -- openapi/; then
+            echo "No OpenAPI spec changes detected. Exiting."
+            exit 0
+          fi
+
+          echo "Installing dependencies..."
+          pnpm install --frozen-lockfile
+
+          echo "Running OpenAPI lint..."
+          pnpm lint:openapi
