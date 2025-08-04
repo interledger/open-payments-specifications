@@ -1,0 +1,17 @@
+{
+  "name": "open-payments-specifications",
+  "description": "OpenAPI specifications for the Open Payments APIs",
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "prettier --check .",
+    "lint:openapi": "spectral lint openapi/*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@stoplight/spectral-cli": "^6.15.0",
+    "prettier": "3.6.2"
+  },
+  "packageManager": "pnpm@10.14.0"
+}

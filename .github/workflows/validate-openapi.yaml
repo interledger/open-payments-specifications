@@ -1,24 +1,31 @@
 name: OpenAPI Validator
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
-    paths:
-      - '*-server.yaml'
 
 jobs:
-  validate-openapi:
+  lint-openapi:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v2
-
-      - name: Lint Open API specs
+      - uses: pnpm/action-setup@v3
+      - name: Validate OpenAPI specs
         run: |
-          npx prettier --check *-server.yaml
+          if git diff --quiet origin/main -- openapi/; then
+            echo "No OpenAPI spec changes detected. Exiting."
+            exit 0
+          fi
 
-      - name: Validate Open API specs
-        run: |
-          echo "{\"extends\":[\"spectral:oas\"}" >> .spectral.json
-          npx @stoplight/spectral-cli lint *-server.yaml
+          echo "Installing dependencies..."
+          pnpm install --frozen-lockfile
+
+          echo "Running OpenAPI lint..."
+          pnpm lint:openapi

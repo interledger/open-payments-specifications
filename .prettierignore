@@ -1,0 +1,6 @@
+.github/*
+pnpm-lock.yaml
+.gitignore
+.prettierignore
+.prettierrc
+.spectral.json
