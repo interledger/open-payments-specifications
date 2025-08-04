@@ -16,12 +16,10 @@ Open Payments APIs are a collection of open API standards that can be implemente
 - Invoice Payments
 
 The Open Payments APIs are a collection of three sub-systems:
+
 - A **wallet address server** which exposes public information about Open Payments-enabled accounts called "wallet addresses"
-- A **resource server** which exposes APIs for performing functions against the
-underlying accounts 
-- A **authorisation server** which exposes APIs compliant with the
-[GNAP](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol) standard for getting grants to access the resource server
-APIs
+- A **resource server** which exposes APIs for performing functions against the underlying accounts
+- A **authorisation server** which exposes APIs compliant with the [GNAP](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol) standard for getting grants to access the resource server APIs
 
 This repository hosts the Open API Specifications of the three APIs which are published along with additional documentation at
 https://openpayments.dev.
