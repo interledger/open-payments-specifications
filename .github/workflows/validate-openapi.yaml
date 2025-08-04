@@ -1,0 +1,26 @@
+name: OpenAPI Validator
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - openapi/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - openapi/**
+
+jobs:
+  validate-openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate OpenAPI specs
+        run: pnpm lint:openapi
