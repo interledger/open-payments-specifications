@@ -4,13 +4,9 @@ on:
   push:
     branches:
       - main
-    paths:
-      - openapi/**
   pull_request:
     branches:
       - main
-    paths:
-      - openapi/**
 
 jobs:
   validate-openapi:
