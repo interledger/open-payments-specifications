@@ -401,7 +401,7 @@ components:
       examples:
         - 'https://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
         - 'http://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
-        - 'https://ilp.interledger-test.dev/incoming-payments/1'    
+        - 'https://ilp.interledger-test.dev/incoming-payments/1'
     access:
       type: array
       description: A description of the rights associated with this access token.
