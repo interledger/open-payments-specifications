@@ -1,0 +1,24 @@
+name: OpenAPI Validator
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '*-server.yaml'
+
+jobs:
+  validate-openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+
+      - name: Lint Open API specs
+        run: |
+          npx prettier --check *-server.yaml
+
+      - name: Validate Open API specs
+        run: |
+          echo "{\"extends\":[\"spectral:oas\"}" >> .spectral.json
+          npx @stoplight/spectral-cli lint *-server.yaml
