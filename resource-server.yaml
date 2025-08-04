@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments
-  version: '1.4'
+  version: '1.0.0'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
