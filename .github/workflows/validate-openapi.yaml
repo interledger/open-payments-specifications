@@ -50,30 +50,34 @@ jobs:
         run: |
           input_version=$(<VERSION)
 
-          read input_major input_minor input_patch <<< $(echo "$input_version" | awk -F'[.v-]' '{print $2, $3, $4}')
-          
+          read input_major input_minor input_patch <<< $(echo "$input_version" | awk -F'[.v-]' '{print $1, $2, $3}')
+
           patch_version_search="v$input_major.$input_minor.*"
           latest_version=$(git tag -l $patch_version_search --sort=-taggerdate | head -n 1)
           if [ -n "$latest_version" ]; then
-            read major minor patch <<< $(echo "$latest_version" | awk -F'[.v-]' '{print $2, $3, $4}')
-            expected_patch=$((patch + 1))
+              read major minor patch <<< $(echo "$latest_version" | awk -F'[.v-]' '{print $1, $2, $3}')
+              expected_patch=$((patch + 1))
 
-            if [ "$input_patch" != "$expected_patch" ]; then
-              echo "Expected '$expected_patch' patch, got $input_patch"
-              exit 1
-            fi
+              if [ "$input_patch" != "$expected_patch" ]; then
+                  echo "New patch version failed: expected ${major}.${minor}.${expected_patch}, got ${input_version}"
+                  exit 1
+          fi
           else
-            minor_version_search="v$input_major.*"
-            latest_version=$(git tag -l $minor_version_search --sort=-taggerdate | head -n 1)
-            if [ -n "$latest_version" ]; then
-              read major minor <<< $(echo "$latest_version" | awk -F'[.v-]' '{print $2, $3}')
-              expected_minor=$((minor + 1))
+              minor_version_search="v$input_major.*"
+              echo "checking minor version $minor_version_search"
+              latest_version=$(git tag -l $minor_version_search --sort=-taggerdate | head -n 1)
+              if [ -n "$latest_version" ]; then
+                  read major minor <<< $(echo "$latest_version" | awk -F'[.v-]' '{print $1, $2}')
+                  expected_minor=$((minor + 1))
+                  expected_patch="0"
 
-              if [ "$input_minor" != "$expected_minor" ]; then
-                echo "Expected '$expected_minor' minor, got $input_minor"
-                exit 1
+                  if [ "$input_minor" != "$expected_minor" ]; then
+                      echo "New minor version failed, expected ${major}.${expected_minor}.${expected_patch}, got ${input_version}"
+                      exit 1
+                  elif [ "$input_patch" != "$expected_patch" ]; then
+                      echo "New minor version failed, expected ${major}.${expected_minor}.${expected_patch}, got ${input_version}"
+                  fi
               fi
-            fi
           fi
       - name: Validate API version across specs
         run: | 
