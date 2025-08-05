@@ -11,6 +11,8 @@ on:
 jobs:
   lint-openapi:
     runs-on: ubuntu-latest
+    outputs:
+      specsChanged: ${{ steps.lint-openapi.outputs.SPECS_CHANGED }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,14 +20,74 @@ jobs:
       - uses: actions/setup-node@v2
       - uses: pnpm/action-setup@v3
       - name: Validate OpenAPI specs
+        id: lint-openapi
         run: |
           if git diff --quiet origin/main -- openapi/; then
             echo "No OpenAPI spec changes detected. Exiting."
+            echo "SPECS_CHANGED=false" >> $GITHUB_OUTPUT
             exit 0
           fi
+
+          echo "SPECS_CHANGED=true" >> $GITHUB_OUTPUT
 
           echo "Installing dependencies..."
           pnpm install --frozen-lockfile
 
           echo "Running OpenAPI lint..."
           pnpm lint:openapi
+
+  validate-version:
+    runs-on: ubuntu-latest
+    needs: [lint-openapi]
+    if: needs.lint-openapi.outputs.specsChanged == 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+      - uses: actions/setup-node@v2
+      - uses: pnpm/action-setup@v3
+      - name: Validate API version
+        run: |
+          input_version=$(<VERSION)
+
+          read input_major input_minor input_patch <<< $(echo "$input_version" | awk -F'[.v-]' '{print $2, $3, $4}')
+          
+          patch_version_search="v$input_major.$input_minor.*"
+          latest_version=$(git tag -l $patch_version_search --sort=-taggerdate | head -n 1)
+          if [ -n "$latest_version" ]; then
+            read major minor patch <<< $(echo "$latest_version" | awk -F'[.v-]' '{print $2, $3, $4}')
+            expected_patch=$((patch + 1))
+
+            if [ "$input_patch" != "$expected_patch" ]; then
+              echo "Expected '$expected_patch' patch, got $input_patch"
+              exit 1
+            fi
+          else
+            minor_version_search="v$input_major.*"
+            latest_version=$(git tag -l $minor_version_search --sort=-taggerdate | head -n 1)
+            if [ -n "$latest_version" ]; then
+              read major minor <<< $(echo "$latest_version" | awk -F'[.v-]' '{print $2, $3}')
+              expected_minor=$((minor + 1))
+
+              if [ "$input_minor" != "$expected_minor" ]; then
+                echo "Expected '$expected_minor' minor, got $input_minor"
+                exit 1
+              fi
+            fi
+          fi
+      - name: Validate API version across specs
+        run: | 
+          expected_version=$(<VERSION)
+          files=(openapi/*.yaml)
+
+          all_match=true
+
+          for file in "${files[@]}"; do
+            version=$(yq e '.info.version' "$file")
+            if [ "$version" != "$expected_version" ]; then
+              echo "Expected version $expected_version in $file, got $version"
+              all_match=false
+            fi
+          done
+
+          $all_match && exit 0 || exit 1
