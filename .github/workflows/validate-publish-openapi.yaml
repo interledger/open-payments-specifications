@@ -22,10 +22,16 @@ jobs:
       - name: Validate OpenAPI specs
         id: lint-openapi
         run: |
-          if git diff --quiet origin/main -- openapi/; then
-            echo "No OpenAPI spec changes detected. Exiting."
-            echo "SPECS_CHANGED=false" >> $GITHUB_OUTPUT
-            exit 0
+          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+              BASE_COMMIT="HEAD^"
+          else
+              BASE_COMMIT=main
+          fi
+
+          if git diff --quiet "$BASE_COMMIT" -- openapi/; then
+              echo "No OpenAPI spec changes detected. Exiting."
+              echo "SPECS_CHANGED=false" >> $GITHUB_OUTPUT
+              exit 0
           fi
 
           echo "SPECS_CHANGED=true" >> $GITHUB_OUTPUT
