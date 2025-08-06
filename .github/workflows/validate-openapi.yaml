@@ -1,4 +1,4 @@
-name: Validate & Publish OpenAPI
+name: Validate OpenAPI
 
 on:
   push:
@@ -46,8 +46,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint-openapi]
     if: needs.lint-openapi.outputs.specsChanged == 'true'
-    outputs:
-      version: ${{ steps.validate-version.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -89,9 +87,6 @@ jobs:
                   fi
               fi
           fi
-
-          echo "VERSION=$input_version" >> $GITHUB_OUTPUT
-
       - name: Validate API version across specs
         run: | 
           expected_version=$(<VERSION)
@@ -112,33 +107,3 @@ jobs:
           echo "github.event_name: ${{ github.event_name }}"
 
           $all_match && exit 0 || exit 1
-  publish:
-    runs-on: ubuntu-latest
-    needs: [validate-version]
-    if: github.ref_name == '7/merge'
-    env:
-      VERSION: ${{ needs.validate-version.outputs.version }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      - name: Create Tag
-        run: |
-          git tag -a v$VERSION -m "v$VERSION"
-          git push -f origin $NEW_VERSION
-      - name: Generate CHANGELOG data
-        id: changelog
-        uses: requarks/changelog-action@v1
-        with:
-          token: ${{ github.token }}
-          tag: v${{ needs.validate-version.outputs.version }}
-          includeRefIssues: false
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true
-          draft: false
-          makeLatest: true
-          name: ${{ needs.validate-version.outputs.version }}
-          body: ${{ steps.changelog.outputs.changes }}
-          tag: ${{ needs.validate-version.outputs.version }}
-          token: ${{ github.token }}
