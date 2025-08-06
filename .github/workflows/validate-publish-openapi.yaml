@@ -90,7 +90,7 @@ jobs:
               fi
           fi
 
-          echo "NEW_VERSION=$input_version" >> $GITHUB_OUTPUT
+          echo "VERSION=$input_version" >> $GITHUB_OUTPUT
 
       - name: Validate API version across specs
         run: | 
