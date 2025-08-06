@@ -25,7 +25,7 @@ jobs:
           if [[ "$GITHUB_REF_NAME" == "main" ]]; then
               BASE_COMMIT="HEAD^"
           else
-              BASE_COMMIT=main
+              BASE_COMMIT="origin/main"
           fi
 
           if git diff --quiet "$BASE_COMMIT" -- openapi/; then
