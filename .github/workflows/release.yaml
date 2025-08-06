@@ -3,7 +3,7 @@ name: Release new version
 on:
   workflow_run:
     workflows: ['Validate OpenAPI']
-    branches: [main]
+    branches: [mk/add-version-publish]
     types:
       - completed
 
