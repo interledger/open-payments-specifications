@@ -1,4 +1,4 @@
-name: OpenAPI Validator
+name: Validate & Publish OpenAPI
 
 on:
   push:
@@ -40,6 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint-openapi]
     if: needs.lint-openapi.outputs.specsChanged == 'true'
+    outputs:
+      version: ${{ steps.validate-version.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,6 +49,7 @@ jobs:
       - uses: actions/setup-node@v2
       - uses: pnpm/action-setup@v3
       - name: Validate API version
+        id: validate-version
         run: |
           input_version=$(<VERSION)
 
@@ -80,6 +83,9 @@ jobs:
                   fi
               fi
           fi
+
+          echo "NEW_VERSION=$input_version" >> $GITHUB_OUTPUT
+
       - name: Validate API version across specs
         run: | 
           expected_version=$(<VERSION)
@@ -96,3 +102,27 @@ jobs:
           done
 
           $all_match && exit 0 || exit 1
+  publish:
+    runs-on: ubuntu-latest
+    needs: [validate-version]
+    if: github.ref == 'refs/heads/mk/add-version-publish'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Generate CHANGELOG data
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ needs.validate-version.outputs.version }}
+          includeRefIssues: false
+      - name: Create Release
+        uses: ncipollo/release-action@v1.16.0
+        with:
+          allowUpdates: true
+          draft: false
+          makeLatest: true
+          name: ${{ needs.validate-version.outputs.version }}
+          body: ${{ steps.changelog.outputs.changes }}
+          tag: ${{ needs.validate-version.outputs.version }}
+          token: ${{ github.token }}
