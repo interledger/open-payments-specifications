@@ -117,7 +117,7 @@ jobs:
           tag: ${{ needs.validate-version.outputs.version }}
           includeRefIssues: false
       - name: Create Release
-        uses: ncipollo/release-action@v1.16.0
+        uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
           draft: false
