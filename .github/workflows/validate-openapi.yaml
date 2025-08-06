@@ -53,7 +53,6 @@ jobs:
       - uses: actions/setup-node@v2
       - uses: pnpm/action-setup@v3
       - name: Validate API version
-        id: validate-version
         run: |
           input_version=$(<VERSION)
 
@@ -101,9 +100,5 @@ jobs:
               all_match=false
             fi
           done
-
-          echo "github.ref: ${{ github.ref }}"
-          echo "github.ref_name: ${{ github.ref_name }}"
-          echo "github.event_name: ${{ github.event_name }}"
 
           $all_match && exit 0 || exit 1
