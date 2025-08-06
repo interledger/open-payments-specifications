@@ -1,9 +1,9 @@
-name: Release new version
+name: Release new Open Payments API version
 
 on:
   workflow_run:
     workflows: ['Validate OpenAPI']
-    branches: [mk/add-version-publish]
+    branches: [main]
     types:
       - completed
 
