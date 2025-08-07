@@ -24,24 +24,9 @@ The Open Payments APIs are a collection of three sub-systems:
 This repository hosts the Open API Specifications of the three APIs which are published along with additional documentation at
 https://openpayments.dev.
 
-### New to Interledger?
+## Contributing
 
-Never heard of Interledger before? Or would you like to learn more? Here are some excellent places to start:
-
-- [Interledger Website](https://interledger.org/)
-- [Interledger Specification](https://interledger.org/developers/rfcs/interledger-protocol/)
-- [Interledger Explainer Video](https://twitter.com/Interledger/status/1567916000074678272)
-- [Open Payments](https://openpayments.dev/)
-- [Web monetization](https://webmonetization.org/)
-
-## Open Payments Catchup Call
-
-Our catchup calls are open to our community. We have them every other Wednesday at 12:00 UTC, via Google Meet.
-
-Video call link: https://meet.google.com/htd-eefo-ovn
-
-Or dial: (DE) +49 30 300195061 and enter this PIN: 105 520 503#
-
-More phone numbers: https://tel.meet/htd-eefo-ovn?hs=5
-
-[Add to Google Calendar](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MDNjYTdhYmE5MTgwNGJhMmIxYmU0YWFkMzI2NTFmMjVfMjAyNDA1MDhUMTIwMDAwWiBjX2NqMDI3Z21oc3VqazkxZXZpMjRkOXB2bXQ0QGc&tmsrc=c_cj027gmhsujk91evi24d9pvmt4%40group.calendar.google.com&scp=ALL)
+1. Make the desired specification changes in the `openapi/` directory.
+2. Update the `VERSION` file to reflect the new version, following [semantic versioning](https://semver.org/).
+3. Update the `info.version` field in **each** specification to match the new version, even if only one specification was modified.
+4. Open a pull request with your changes.
