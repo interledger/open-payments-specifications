@@ -827,7 +827,7 @@ components:
     walletAddress:
       title: Wallet Address
       type: string
-      description: 'URL of a wallet address hosted by a Rafiki instance.'
+      description: 'The URL of an Open Payments wallet address'
       format: uri
     receiver:
       title: Receiver
