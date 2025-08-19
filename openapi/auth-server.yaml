@@ -780,6 +780,7 @@ components:
               - id
               - format
           minItems: 1
+          maxItems: 1
       required:
         - sub_ids
   securitySchemes:
