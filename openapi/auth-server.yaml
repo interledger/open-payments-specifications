@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments Authorization Server
-  version: '1.0.3'
+  version: '1.1.0'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -96,23 +96,39 @@ paths:
         content:
           application/json:
             schema:
-              description: ''
-              type: object
-              properties:
-                access_token:
+              anyOf:
+                - title: with Access Token
                   type: object
-                  required:
-                    - access
                   properties:
-                    access:
-                      $ref: '#/components/schemas/access'
-                client:
-                  $ref: '#/components/schemas/client'
-                interact:
-                  $ref: '#/components/schemas/interact-request'
-              required:
-                - access_token
-                - client
+                    client:
+                      $ref: '#/components/schemas/client'
+                    interact:
+                      $ref: '#/components/schemas/interact-request'
+                    access_token:
+                      type: object
+                      required: [access]
+                      properties:
+                        access:
+                          $ref: '#/components/schemas/access'
+                    subject:
+                      $ref: '#/components/schemas/subject'
+                  required: [client, access_token]
+                - title: with Subject
+                  type: object
+                  properties:
+                    client:
+                      $ref: '#/components/schemas/client'
+                    interact:
+                      $ref: '#/components/schemas/interact-request'
+                    access_token:
+                      type: object
+                      required: [access]
+                      properties:
+                        access:
+                          $ref: '#/components/schemas/access'
+                    subject:
+                      $ref: '#/components/schemas/subject'
+                  required: [client, interact, subject]
             examples:
               Grant request for creating and reading recurring fixed payment:
                 value:
@@ -148,6 +164,20 @@ paths:
                           - read
                         identifier: 'http://ilp.interledger-test.dev/bob'
                   client: 'https://webmonize.com/.well-known/pay'
+              Grant request for subject information:
+                value:
+                  subject:
+                    sub_ids:
+                      - id: 'https://ilp.interledger-test.dev/alice'
+                        format: 'uri'
+                  client: 'https://webmonize.com/.well-known/pay'
+                  interact:
+                    start:
+                      - redirect
+                    finish:
+                      method: redirect
+                      uri: 'https://webmonize.com/return/876FGRD8VC'
+                      nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
         description: ''
         required: true
       description: Make a new grant request
@@ -175,12 +205,14 @@ paths:
                 properties:
                   access_token:
                     $ref: '#/components/schemas/access_token'
+                  subject:
+                    $ref: '#/components/schemas/subject'
                   continue:
                     $ref: '#/components/schemas/continue'
                 required:
                   - continue
               examples:
-                Continuing After a Completed Interaction:
+                Continuing after a completed interaction (returning access token):
                   value:
                     access_token:
                       value: OS9M2PMHKUR64TB8N6BW7OZB8CDFONP219RP1LT0
@@ -204,7 +236,18 @@ paths:
                         value: 33OMUKMKSKU80UPRY5NM
                       uri: 'https://auth.interledger-test.dev/continue/4CF492MLVMSW9MKMXKHQ'
                       wait: 30
-                Continuing During Pending Interaction:
+                Continuing after a completed interaction (returning subject information):
+                  value:
+                    subject:
+                      sub_ids:
+                        - id: 'https://ilp.interledger-test.dev/alice'
+                          format: uri
+                    continue:
+                      access_token:
+                        value: 33OMUKMKSKU80UPRY5NM
+                      uri: 'https://auth.interledger-test.dev/continue/4CF492MLVMSW9MKMXKHQ'
+                      wait: 30
+                Continuing during pending interaction:
                   value:
                     continue:
                       access_token:
@@ -714,6 +757,32 @@ components:
               type: string
               enum:
                 - invalid_rotation
+    subject:
+      title: subject
+      type: object
+      description: Information about the subject for which the client is requesting information.
+      properties:
+        sub_ids:
+          type: array
+          description: A list of subject identifiers.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Specific identifier for the subject for which the client is requesting information.
+              format:
+                type: string
+                description: The format of subject identifier that the client can accept.
+                enum:
+                  - uri
+            required:
+              - id
+              - format
+          minItems: 1
+          maxItems: 1
+      required:
+        - sub_ids
   securitySchemes:
     GNAP:
       name: Authorization
