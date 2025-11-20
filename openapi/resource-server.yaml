@@ -800,44 +800,44 @@ paths:
         - $ref: '#/components/parameters/signature'
     parameters:
       - $ref: '#/components/parameters/id'
-    '/outgoing-payment-grant':
-      get:
-        summary: Get spent amounts for current outgoing payment grant
-        tags:
-          - outgoing-payment
-        operationId: get-outgoing-payment-grant
-        responses:
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
+  '/outgoing-payment-grant':
+    get:
+      summary: Get spent amounts for current outgoing payment grant
+      tags:
+        - outgoing-payment
+      operationId: get-outgoing-payment-grant
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  spentReceiveAmount:
+                    $ref: '#/components/schemas/amount'
+                  spentDebitAmount:
+                    $ref: '#/components/schemas/amount'
+              examples:
+                Grant spent amounts:
+                  value:
                     spentReceiveAmount:
-                      $ref: '#/components/schemas/amount'
+                      value: '2500'
+                      assetCode: USD
+                      assetScale: 2
                     spentDebitAmount:
-                      $ref: '#/components/schemas/amount'
-                examples:
-                  Grant spent amounts:
-                    value:
-                      spentReceiveAmount:
-                        value: '2500'
-                        assetCode: USD
-                        assetScale: 2
-                      spentDebitAmount:
-                        value: '2600'
-                        assetCode: USD
-                        assetScale: 2
-          '401':
-            $ref: '#/components/responses/401'
-          '403':
-            $ref: '#/components/responses/403'
-        description: |-
-          Returns the spent amounts for the current grant corresponding to the presented GNAP access token, if any. If a grant was created with an interval (recurring), the amounts returned are for the current interval.
-        parameters:
-          - $ref: '#/components/parameters/signature-input'
-          - $ref: '#/components/parameters/signature'
+                      value: '2600'
+                      assetCode: USD
+                      assetScale: 2
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+      description: |-
+        Returns the spent amounts for the current grant corresponding to the presented GNAP access token, if any. If a grant was created with an interval (recurring), the amounts returned are for the current interval.
+      parameters:
+        - $ref: '#/components/parameters/signature-input'
+        - $ref: '#/components/parameters/signature'
 components:
   schemas:
     amount:
