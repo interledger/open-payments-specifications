@@ -800,7 +800,7 @@ paths:
         - $ref: '#/components/parameters/signature'
     parameters:
       - $ref: '#/components/parameters/id'
-    /outgoing-payment-grant:
+    '/outgoing-payment-grant':
       get:
         summary: Get spent amounts for current outgoing payment grant
         tags:
