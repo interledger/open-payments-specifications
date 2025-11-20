@@ -518,6 +518,7 @@ components:
       required:
         - type
         - actions
+        - identifier
     access-quote:
       title: access-quote
       type: object
