@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments Authorization Server
-  version: '1.2.0'
+  version: '1.3.0'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -164,6 +164,23 @@ paths:
                           - read
                         identifier: 'http://ilp.interledger-test.dev/bob'
                   client: 'https://webmonize.com/.well-known/pay'
+              Grant request with directed identity (JWK):
+                value:
+                  access_token:
+                    access:
+                      - type: incoming-payment
+                        actions:
+                          - create
+                          - read
+                        identifier: 'http://ilp.interledger-test.dev/bob'
+                  client:
+                    jwk:
+                      kid: example-key-1
+                      alg: EdDSA
+                      use: sig
+                      kty: OKP
+                      crv: Ed25519
+                      x: 11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo
               Grant request for subject information:
                 value:
                   subject:
@@ -565,15 +582,42 @@ components:
       additionalProperties: false
     client:
       title: client
-      type: string
       description: |-
-        Wallet address of the client instance that is making this request.
+        Client identification for grant requests.
 
         When sending a non-continuation request to the AS, the client instance MUST identify itself by including the client field of the request and by signing the request.
 
+        Can be either:
+        - A wallet address string (backwards compatible format)
+        - An object with either `jwk` (for directed identity) or `walletAddress` (mutually exclusive)
+
+        When using a wallet address string or the `walletAddress` property:
         A JSON Web Key Set document, including the public key that the client instance will use to protect this request and any continuation requests at the AS and any user-facing information about the client instance used in interactions, MUST be available at the wallet address + `/jwks.json` url.
 
+        When using the `jwk` property (directed identity approach):
+        The client instance provides its public key directly in the request, eliminating the need for the AS to fetch it from a wallet address. This approach enhances privacy by not requiring the client to expose a persistent wallet address identifier.
+
         If sending a grant initiation request that requires RO interaction, the wallet address MUST serve necessary client display information.
+      oneOf:
+        - type: string
+          format: uri
+          description: 'DEPRECATED: This string format of the client wallet address is maintained only for backwards compatibility. Migrate to the object form with `jwk` or `walletAddress`.'
+          deprecated: true
+        - type: object
+          description: Client identification object with either a JWK (for directed identity) or wallet address.
+          properties:
+            walletAddress:
+              type: string
+              format: uri
+              description: Wallet address of the client instance that is making this request.
+            jwk:
+              $ref: '#/components/schemas/json-web-key'
+          oneOf:
+            - required:
+                - walletAddress
+            - required:
+                - jwk
+          additionalProperties: false
     continue:
       title: continue
       type: object
@@ -783,6 +827,46 @@ components:
           maxItems: 1
       required:
         - sub_ids
+    json-web-key:
+      type: object
+      properties:
+        kid:
+          type: string
+        alg:
+          type: string
+          description: 'The cryptographic algorithm family used with the key. The only allowed value is `EdDSA`. '
+          enum:
+            - EdDSA
+        use:
+          type: string
+          enum:
+            - sig
+        kty:
+          type: string
+          enum:
+            - OKP
+        crv:
+          type: string
+          enum:
+            - Ed25519
+        x:
+          type: string
+          pattern: '^[a-zA-Z0-9-_]+$'
+          description: The base64 url-encoded public key.
+      required:
+        - kid
+        - alg
+        - kty
+        - crv
+        - x
+      title: Ed25519 Public Key
+      description: A JWK representation of an Ed25519 Public Key
+      examples:
+        - kid: key-1
+          use: sig
+          kty: OKP
+          crv: Ed25519
+          x: 11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo
   securitySchemes:
     GNAP:
       name: Authorization
