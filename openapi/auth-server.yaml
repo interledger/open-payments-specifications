@@ -604,19 +604,18 @@ components:
           description: 'DEPRECATED: This string format of the client wallet address is maintained only for backwards compatibility. Migrate to the object form with `jwk` or `walletAddress`.'
           deprecated: true
         - type: object
-          description: Client identification object with either a JWK (for directed identity) or wallet address.
+          required: [walletAddress]
           properties:
             walletAddress:
               type: string
               format: uri
               description: Wallet address of the client instance that is making this request.
+          additionalProperties: false
+        - type: object
+          required: [jwk]
+          properties:
             jwk:
               $ref: '#/components/schemas/json-web-key'
-          oneOf:
-            - required:
-                - walletAddress
-            - required:
-                - jwk
           additionalProperties: false
     continue:
       title: continue
