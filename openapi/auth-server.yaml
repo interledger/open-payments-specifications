@@ -846,6 +846,7 @@ components:
           enum:
             - OKP
         crv:
+          description: 'The cryptographic curve used with the key. This parameter identifies the elliptic curve (for EC keys) or the Edwards curve (for OKP keys). The only allowed value is `Ed25519`.'
           type: string
           enum:
             - Ed25519
