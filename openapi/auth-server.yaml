@@ -595,7 +595,7 @@ components:
         A JSON Web Key Set document, including the public key that the client instance will use to protect this request and any continuation requests at the AS and any user-facing information about the client instance used in interactions, MUST be available at the wallet address + `/jwks.json` url.
 
         When using the `jwk` property (directed identity approach):
-        The client instance provides its public key directly in the request, eliminating the need for the AS to fetch it from a wallet address. This approach enhances privacy by not requiring the client to expose a persistent wallet address identifier.
+        The client instance provides its public key directly in the request, eliminating the need for the AS to fetch it from a wallet address. This approach enhances privacy by not requiring the client to expose a persistent wallet address identifier. The `jwk` property can only be used for non-interactive grant requests (i.e.: incoming payments).
 
         If sending a grant initiation request that requires RO interaction, the wallet address MUST serve necessary client display information.
       oneOf:
