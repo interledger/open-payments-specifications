@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments
-  version: '1.2.0'
+  version: '1.3.0'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -813,6 +813,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - spentReceiveAmount
+                  - spentDebitAmount
                 properties:
                   spentReceiveAmount:
                     anyOf:
@@ -833,6 +836,10 @@ paths:
                       value: '2600'
                       assetCode: USD
                       assetScale: 2
+                No spent amounts:
+                  value:
+                    spentReceiveAmount: null
+                    spentDebitAmount: null
         '401':
           $ref: '#/components/responses/401'
         '403':
