@@ -815,9 +815,13 @@ paths:
                 type: object
                 properties:
                   spentReceiveAmount:
-                    $ref: '#/components/schemas/amount'
+                    anyOf:
+                      - $ref: '#/components/schemas/amount'
+                      - type: 'null'
                   spentDebitAmount:
-                    $ref: '#/components/schemas/amount'
+                    anyOf:
+                      - $ref: '#/components/schemas/amount'
+                      - type: 'null'
               examples:
                 Grant spent amounts:
                   value:
