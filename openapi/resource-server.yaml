@@ -813,11 +813,18 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - spentReceiveAmount
+                  - spentDebitAmount
                 properties:
                   spentReceiveAmount:
-                    $ref: '#/components/schemas/amount'
+                    anyOf:
+                      - $ref: '#/components/schemas/amount'
+                      - type: 'null'
                   spentDebitAmount:
-                    $ref: '#/components/schemas/amount'
+                    anyOf:
+                      - $ref: '#/components/schemas/amount'
+                      - type: 'null'
               examples:
                 Grant spent amounts:
                   value:
@@ -829,6 +836,10 @@ paths:
                       value: '2600'
                       assetCode: USD
                       assetScale: 2
+                No spent amounts:
+                  value:
+                    spentReceiveAmount: null
+                    spentDebitAmount: null
         '401':
           $ref: '#/components/responses/401'
         '403':
