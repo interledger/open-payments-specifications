@@ -134,7 +134,7 @@ paths:
                 value:
                   access_token:
                     access:
-                      - type: outgoing-payment
+                      - type: payment
                         actions:
                           - create
                           - read
@@ -236,7 +236,7 @@ paths:
                       manage: 'https://auth.interledger-test.dev/token/dd17a202-9982-4ed9-ae31-564947fb6379'
                       expires_in: 3600
                       access:
-                        - type: outgoing-payment
+                        - type: payment
                           actions:
                             - create
                             - read
@@ -368,7 +368,7 @@ paths:
                       manage: 'https://auth.interledger-test.dev/token/8f69de01-5bf9-4603-91ed-eeca101081f1'
                       expires_in: 3600
                       access:
-                        - type: outgoing-payment
+                        - type: payment
                           actions:
                             - create
                             - read
@@ -472,7 +472,7 @@ components:
     access-item:
       oneOf:
         - $ref: '#/components/schemas/access-payment-intent'
-        - $ref: '#/components/schemas/access-outgoing'
+        - $ref: '#/components/schemas/access-payment'
         - $ref: '#/components/schemas/access-quote'
       description: The access associated with the access token is described using objects that each contain multiple dimensions of access.
       unevaluatedProperties: false
@@ -505,14 +505,14 @@ components:
       required:
         - type
         - actions
-    access-outgoing:
-      title: access-outgoing
+    access-payment:
+      title: access-payment
       type: object
       properties:
         type:
           type: string
           enum:
-            - outgoing-payment
+            - payment
           description: The type of resource request as a string.  This field defines which other fields are allowed in the request object.
         actions:
           type: array
@@ -531,7 +531,7 @@ components:
           format: uri
           description: A string identifier indicating a specific resource at the RS.
         limits:
-          $ref: '#/components/schemas/limits-outgoing'
+          $ref: '#/components/schemas/limits-payment'
       required:
         - type
         - actions
@@ -696,9 +696,9 @@ components:
         - 'R11/2022-08-24T14:15:22Z/P1M'
         - 'R/2017-03-01T13:00:00Z/2018-05-11T15:30:00Z'
         - 'R-1/P1Y2M10DT2H30M/2022-05-11T15:30:00Z'
-    limits-outgoing:
-      title: limits-outgoing
-      description: Open Payments specific property that defines the limits under which outgoing payments can be created.
+    limits-payment:
+      title: limits-payment
+      description: Open Payments specific property that defines the limits under which payments can be created.
       anyOf:
         - type: object
           properties:
