@@ -63,7 +63,7 @@ paths:
                       manage: 'https://auth.interledger-test.dev/token/dd17a202-9982-4ed9-ae31-564947fb6379'
                       expires_in: 3600
                       access:
-                        - type: incoming-payment
+                        - type: payment-intent
                           actions:
                             - create
                             - read
@@ -140,7 +140,7 @@ paths:
                           - read
                         identifier: 'https://ilp.interledger-test.dev/alice'
                         limits:
-                          receiver: 'https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7'
+                          receiver: 'https://ilp.interledger-test.dev/payment-intents/45a0d0ee-26dc-4c66-89e0-01fbf93156f7'
                           interval: 'R12/2019-08-24T14:15:22Z/P1M'
                           debitAmount:
                             value: '500'
@@ -154,11 +154,11 @@ paths:
                       method: redirect
                       uri: 'https://webmonize.com/return/876FGRD8VC'
                       nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
-              Grant request for creating and reading incoming payments:
+              Grant request for creating and reading payment intents:
                 value:
                   access_token:
                     access:
-                      - type: incoming-payment
+                      - type: payment-intent
                         actions:
                           - create
                           - read
@@ -168,7 +168,7 @@ paths:
                 value:
                   access_token:
                     access:
-                      - type: incoming-payment
+                      - type: payment-intent
                         actions:
                           - create
                           - read
@@ -242,7 +242,7 @@ paths:
                             - read
                           identifier: 'https://ilp.interledger-test.dev/alice'
                           limits:
-                            receiver: 'https://ilp.interledger-test.dev/bob/incoming-payments/48884225-b393-4872-90de-1b737e2491c2'
+                            receiver: 'https://ilp.interledger-test.dev/bob/payment-intents/48884225-b393-4872-90de-1b737e2491c2'
                             interval: 'R12/2019-08-24T14:15:22Z/P1M'
                             debitAmount:
                               value: '500'
@@ -375,7 +375,7 @@ paths:
                           identifier: 'https://ilp.interledger-test.dev/alice'
                           limits:
                             interval: 'R12/2019-08-24T14:15:22Z/P1M'
-                            receiver: 'https://ilp.interledger-test.dev/bob/incoming-payments/48884225-b393-4872-90de-1b737e2491c2'
+                            receiver: 'https://ilp.interledger-test.dev/bob/payment-intents/48884225-b393-4872-90de-1b737e2491c2'
                             debitAmount:
                               value: '500'
                               assetCode: USD
@@ -455,13 +455,13 @@ components:
     receiver:
       title: Receiver
       type: string
-      description: The URL of the incoming payment that is being paid.
+      description: The URL of the payment intent that is being paid.
       format: uri
-      pattern: '^(https|http)://(.+)/incoming-payments/(.+)$'
+      pattern: '^(https|http)://(.+)/payment-intents/(.+)$'
       examples:
-        - 'https://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
-        - 'http://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
-        - 'https://ilp.interledger-test.dev/incoming-payments/1'
+        - 'https://ilp.interledger-test.dev/payment-intents/08394f02-7b7b-45e2-b645-51d04e7c330c'
+        - 'http://ilp.interledger-test.dev/payment-intents/08394f02-7b7b-45e2-b645-51d04e7c330c'
+        - 'https://ilp.interledger-test.dev/payment-intents/1'
     access:
       type: array
       description: A description of the rights associated with this access token.
@@ -471,19 +471,19 @@ components:
       maxItems: 3
     access-item:
       oneOf:
-        - $ref: '#/components/schemas/access-incoming'
+        - $ref: '#/components/schemas/access-payment-intent'
         - $ref: '#/components/schemas/access-outgoing'
         - $ref: '#/components/schemas/access-quote'
       description: The access associated with the access token is described using objects that each contain multiple dimensions of access.
       unevaluatedProperties: false
-    access-incoming:
-      title: access-incoming
+    access-payment-intent:
+      title: access-payment-intent
       type: object
       properties:
         type:
           type: string
           enum:
-            - incoming-payment
+            - payment-intent
           description: The type of resource request as a string.  This field defines which other fields are allowed in the request object.
         actions:
           type: array
@@ -595,7 +595,7 @@ components:
         A JSON Web Key Set document, including the public key that the client instance will use to protect this request and any continuation requests at the AS and any user-facing information about the client instance used in interactions, MUST be available at the wallet address + `/jwks.json` url.
 
         When using the `jwk` property (directed identity approach):
-        The client instance provides its public key directly in the request, eliminating the need for the AS to fetch it from a wallet address. This approach enhances privacy by not requiring the client to expose a persistent wallet address identifier. The `jwk` property can only be used for non-interactive grant requests (i.e.: incoming payments).
+        The client instance provides its public key directly in the request, eliminating the need for the AS to fetch it from a wallet address. This approach enhances privacy by not requiring the client to expose a persistent wallet address identifier. The `jwk` property can only be used for non-interactive grant requests (i.e.: payment intents).
 
         If sending a grant initiation request that requires RO interaction, the wallet address MUST serve necessary client display information.
       oneOf:
