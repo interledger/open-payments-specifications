@@ -4,3 +4,4 @@ pnpm-lock.yaml
 .prettierignore
 .prettierrc
 .spectral.json
+json/
