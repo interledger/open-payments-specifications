@@ -29,4 +29,5 @@ https://openpayments.dev.
 1. Make the desired specification changes in the `openapi/` directory.
 2. Update the `VERSION` file to reflect the new version, following [semantic versioning](https://semver.org/).
 3. Update the `info.version` field in **each** specification to match the new version, even if only one specification was modified.
-4. Open a pull request with your changes.
+4. Run `pnpm generate:json` to generate the JSON files from the OpenAPI specs.
+5. Open a pull request with your changes.
