@@ -19,3 +19,7 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
           pnpm lint
+      - name: Check if generated JSON files are up to date
+        run: |
+          pnpm generate:json
+          git diff --exit-code json/
