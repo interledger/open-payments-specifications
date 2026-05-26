@@ -3,5 +3,5 @@ pnpm-lock.yaml
 .gitignore
 .prettierignore
 .prettierrc
-.spectral.json
+.redocly.yaml
 json/
