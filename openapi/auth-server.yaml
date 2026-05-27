@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments Authorization Server
-  version: '1.3.0'
+  version: '1.3.1'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -96,39 +96,7 @@ paths:
         content:
           application/json:
             schema:
-              anyOf:
-                - title: with Access Token
-                  type: object
-                  properties:
-                    client:
-                      $ref: '#/components/schemas/client'
-                    interact:
-                      $ref: '#/components/schemas/interact-request'
-                    access_token:
-                      type: object
-                      required: [access]
-                      properties:
-                        access:
-                          $ref: '#/components/schemas/access'
-                    subject:
-                      $ref: '#/components/schemas/subject'
-                  required: [client, access_token]
-                - title: with Subject
-                  type: object
-                  properties:
-                    client:
-                      $ref: '#/components/schemas/client'
-                    interact:
-                      $ref: '#/components/schemas/interact-request'
-                    access_token:
-                      type: object
-                      required: [access]
-                      properties:
-                        access:
-                          $ref: '#/components/schemas/access'
-                    subject:
-                      $ref: '#/components/schemas/subject'
-                  required: [client, interact, subject]
+              $ref: '#/components/schemas/grant-request'
             examples:
               Grant request for creating and reading recurring fixed payment:
                 value:
@@ -300,13 +268,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                interact_ref:
-                  type: string
-                  description: |-
-                    The interaction reference generated for this
-                    interaction by the AS.
+              $ref: '#/components/schemas/continuation-request'
             examples:
               Interaction Reference:
                 value:
@@ -430,6 +392,48 @@ paths:
         - token
 components:
   schemas:
+    grant-request:
+      anyOf:
+        - title: with Access Token
+          type: object
+          properties:
+            client:
+              $ref: '#/components/schemas/client'
+            interact:
+              $ref: '#/components/schemas/interact-request'
+            access_token:
+              type: object
+              required: [access]
+              properties:
+                access:
+                  $ref: '#/components/schemas/access'
+            subject:
+              $ref: '#/components/schemas/subject'
+          required: [client, access_token]
+        - title: with Subject
+          type: object
+          properties:
+            client:
+              $ref: '#/components/schemas/client'
+            interact:
+              $ref: '#/components/schemas/interact-request'
+            access_token:
+              type: object
+              required: [access]
+              properties:
+                access:
+                  $ref: '#/components/schemas/access'
+            subject:
+              $ref: '#/components/schemas/subject'
+          required: [client, interact, subject]
+    continuation-request:
+      type: object
+      properties:
+        interact_ref:
+          type: string
+          description: |-
+            The interaction reference generated for this
+            interaction by the AS.
     amount:
       title: amount
       type: object

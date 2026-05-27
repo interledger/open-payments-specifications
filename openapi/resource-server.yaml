@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments
-  version: '1.3.0'
+  version: '1.3.1'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -85,25 +85,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: false
-              properties:
-                walletAddress:
-                  $ref: '#/components/schemas/walletAddress'
-                incomingAmount:
-                  $ref: '#/components/schemas/amount'
-                  description: The maximum amount that should be paid into the wallet address under this incoming payment.
-                expiresAt:
-                  type: string
-                  description: The date and time when payments into the incoming payment must no longer be accepted.
-                  format: date-time
-                  writeOnly: true
-                metadata:
-                  type: object
-                  additionalProperties: true
-                  description: Additional metadata associated with the incoming payment. (Optional)
-              required:
-                - walletAddress
+              $ref: '#/components/schemas/create-incoming-payment-request'
             examples:
               Create incoming payment for $25 to pay invoice INV2022-02-0137:
                 value:
@@ -305,43 +287,7 @@ paths:
                   metadata:
                     externalRef: INV2022-02-0137
             schema:
-              oneOf:
-                - type: object
-                  properties:
-                    walletAddress:
-                      $ref: '#/components/schemas/walletAddress'
-                    quoteId:
-                      type: string
-                      format: uri
-                      description: The URL of the quote defining this payment's amounts.
-                    metadata:
-                      type: object
-                      additionalProperties: true
-                      description: Additional metadata associated with the outgoing payment. (Optional)
-                  required:
-                    - quoteId
-                    - walletAddress
-                  additionalProperties: false
-                - type: object
-                  properties:
-                    walletAddress:
-                      $ref: '#/components/schemas/walletAddress'
-                    incomingPayment:
-                      type: string
-                      format: uri
-                      description: The URL of the incoming payment this outgoing payment will fulfill.
-                    debitAmount:
-                      description: The fixed amount that would be sent from the sending wallet address given a successful outgoing payment.
-                      $ref: '#/components/schemas/amount'
-                    metadata:
-                      type: object
-                      additionalProperties: true
-                      description: Additional metadata associated with the outgoing payment. (Optional)
-                  required:
-                    - incomingPayment
-                    - debitAmount
-                    - walletAddress
-                  additionalProperties: false
+              $ref: '#/components/schemas/create-outgoing-payment-request'
         description: |-
           A subset of the outgoing payments schema is accepted as input to create a new outgoing payment.
 
@@ -550,54 +496,7 @@ paths:
                     assetCode: USD
                     assetScale: 2
             schema:
-              oneOf:
-                - description: Create quote for an `receiver` that is an Incoming Payment with an `incomingAmount`
-                  properties:
-                    walletAddress:
-                      $ref: '#/components/schemas/walletAddress'
-                    receiver:
-                      $ref: '#/components/schemas/receiver'
-                    method:
-                      $ref: '#/components/schemas/payment-method'
-                  required:
-                    - walletAddress
-                    - receiver
-                    - method
-                  additionalProperties: false
-                - description: Create a quote with a fixed-receive amount
-                  properties:
-                    walletAddress:
-                      $ref: '#/components/schemas/walletAddress'
-                    receiver:
-                      $ref: '#/components/schemas/receiver'
-                    method:
-                      $ref: '#/components/schemas/payment-method'
-                    receiveAmount:
-                      description: The fixed amount that would be paid into the receiving wallet address given a successful outgoing payment.
-                      $ref: '#/components/schemas/amount'
-                  required:
-                    - walletAddress
-                    - receiver
-                    - method
-                    - receiveAmount
-                  additionalProperties: false
-                - description: Create a quote with a fixed-send amount
-                  properties:
-                    walletAddress:
-                      $ref: '#/components/schemas/walletAddress'
-                    receiver:
-                      $ref: '#/components/schemas/receiver'
-                    method:
-                      $ref: '#/components/schemas/payment-method'
-                    debitAmount:
-                      description: The fixed amount that would be sent from the sending wallet address given a successful outgoing payment.
-                      $ref: '#/components/schemas/amount'
-                  required:
-                    - walletAddress
-                    - receiver
-                    - method
-                    - debitAmount
-                  additionalProperties: false
+              $ref: '#/components/schemas/create-quote-request'
         description: |-
           A subset of the quotes schema is accepted as input to create a new quote.
 
@@ -851,6 +750,113 @@ paths:
         - $ref: '#/components/parameters/signature'
 components:
   schemas:
+    create-incoming-payment-request:
+      type: object
+      additionalProperties: false
+      properties:
+        walletAddress:
+          $ref: '#/components/schemas/walletAddress'
+        incomingAmount:
+          $ref: '#/components/schemas/amount'
+          description: The maximum amount that should be paid into the wallet address under this incoming payment.
+        expiresAt:
+          type: string
+          description: The date and time when payments into the incoming payment must no longer be accepted.
+          format: date-time
+          writeOnly: true
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional metadata associated with the incoming payment. (Optional)
+      required:
+        - walletAddress
+    create-outgoing-payment-request:
+      oneOf:
+        - type: object
+          properties:
+            walletAddress:
+              $ref: '#/components/schemas/walletAddress'
+            quoteId:
+              type: string
+              format: uri
+              description: The URL of the quote defining this payment's amounts.
+            metadata:
+              type: object
+              additionalProperties: true
+              description: Additional metadata associated with the outgoing payment. (Optional)
+          required:
+            - quoteId
+            - walletAddress
+          additionalProperties: false
+        - type: object
+          properties:
+            walletAddress:
+              $ref: '#/components/schemas/walletAddress'
+            incomingPayment:
+              type: string
+              format: uri
+              description: The URL of the incoming payment this outgoing payment will fulfill.
+            debitAmount:
+              description: The fixed amount that would be sent from the sending wallet address given a successful outgoing payment.
+              $ref: '#/components/schemas/amount'
+            metadata:
+              type: object
+              additionalProperties: true
+              description: Additional metadata associated with the outgoing payment. (Optional)
+          required:
+            - incomingPayment
+            - debitAmount
+            - walletAddress
+          additionalProperties: false
+    create-quote-request:
+      oneOf:
+        - description: Create quote for an `receiver` that is an Incoming Payment with an `incomingAmount`
+          properties:
+            walletAddress:
+              $ref: '#/components/schemas/walletAddress'
+            receiver:
+              $ref: '#/components/schemas/receiver'
+            method:
+              $ref: '#/components/schemas/payment-method'
+          required:
+            - walletAddress
+            - receiver
+            - method
+          additionalProperties: false
+        - description: Create a quote with a fixed-receive amount
+          properties:
+            walletAddress:
+              $ref: '#/components/schemas/walletAddress'
+            receiver:
+              $ref: '#/components/schemas/receiver'
+            method:
+              $ref: '#/components/schemas/payment-method'
+            receiveAmount:
+              description: The fixed amount that would be paid into the receiving wallet address given a successful outgoing payment.
+              $ref: '#/components/schemas/amount'
+          required:
+            - walletAddress
+            - receiver
+            - method
+            - receiveAmount
+          additionalProperties: false
+        - description: Create a quote with a fixed-send amount
+          properties:
+            walletAddress:
+              $ref: '#/components/schemas/walletAddress'
+            receiver:
+              $ref: '#/components/schemas/receiver'
+            method:
+              $ref: '#/components/schemas/payment-method'
+            debitAmount:
+              description: The fixed amount that would be sent from the sending wallet address given a successful outgoing payment.
+              $ref: '#/components/schemas/amount'
+          required:
+            - walletAddress
+            - receiver
+            - method
+            - debitAmount
+          additionalProperties: false
     amount:
       title: amount
       type: object
@@ -996,7 +1002,6 @@ components:
           description: The URL of the authorization server endpoint for getting grants and access tokens for this wallet address.
       required:
         - authServer
-      unresolvedProperites: false
     outgoing-payment:
       title: Outgoing Payment
       description: 'An **outgoing payment** resource represents a payment that will be, is currently being, or has previously been, sent from the wallet address.'

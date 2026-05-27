@@ -4,13 +4,14 @@
   "scripts": {
     "format": "prettier --write .",
     "lint": "prettier --check .",
-    "lint:openapi": "spectral lint openapi/*"
+    "lint:openapi": "redocly lint openapi/* --lint-config error --format=stylish",
+    "generate:json": "redocly bundle openapi/auth-server.yaml --output json/auth-server.json && redocly bundle openapi/resource-server.yaml --output json/resource-server.json && redocly bundle openapi/wallet-address-server.yaml --output json/wallet-address-server.json"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@stoplight/spectral-cli": "^6.15.0",
+    "@redocly/cli": "^2.31.2",
     "prettier": "3.6.2"
   },
   "packageManager": "pnpm@10.14.0"
