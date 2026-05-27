@@ -1439,8 +1439,7 @@
         },
         "required": [
           "authServer"
-        ],
-        "unresolvedProperites": false
+        ]
       },
       "outgoing-payment": {
         "title": "Outgoing Payment",

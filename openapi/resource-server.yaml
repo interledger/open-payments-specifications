@@ -1002,7 +1002,6 @@ components:
           description: The URL of the authorization server endpoint for getting grants and access tokens for this wallet address.
       required:
         - authServer
-      unresolvedProperites: false
     outgoing-payment:
       title: Outgoing Payment
       description: 'An **outgoing payment** resource represents a payment that will be, is currently being, or has previously been, sent from the wallet address.'
