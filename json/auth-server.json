@@ -8,7 +8,7 @@
       "identifier": "Apache-2.0"
     },
     "summary": "Open Payments Authorization Server",
-    "description": "The Open Payments API is secured via [GNAP](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol). This specification describes the Open Payments Authorization Server API, which is an opinionated GNAP Server API.",
+    "description": "The authorization server handles grant requests and access token management for the Open Payments protocol, using [GNAP](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol) (Grant Negotiation and Authorization Protocol).\n\n**Endpoints:**\n- `POST /` — initiate a grant request\n- `POST /continue/{id}` — continue a pending grant request\n- `DELETE /continue/{id}` — cancel a pending grant request\n- `POST /token/{id}` — rotate an access token\n- `DELETE /token/{id}` — revoke an access token\n\nFor an overview of how Open Payments authorization works, see [the Authorization concepts page](https://openpayments.dev/concepts/auth/).",
     "contact": {
       "email": "tech@interledger.org"
     }
@@ -46,6 +46,7 @@
                 "schema": {
                   "oneOf": [
                     {
+                      "title": "Pending interaction",
                       "properties": {
                         "interact": {
                           "$ref": "#/components/schemas/interact-response"
@@ -60,6 +61,7 @@
                       ]
                     },
                     {
+                      "title": "Approved",
                       "properties": {
                         "access_token": {
                           "$ref": "#/components/schemas/access_token"
@@ -290,7 +292,8 @@
           },
           "name": "id",
           "in": "path",
-          "required": true
+          "required": true,
+          "description": "The unique reference ID of the grant request continuation."
         }
       ],
       "post": {
@@ -516,7 +519,8 @@
           },
           "name": "id",
           "in": "path",
-          "required": true
+          "required": true,
+          "description": "The unique reference of the access token to be managed."
         }
       ],
       "post": {
@@ -935,12 +939,14 @@
         "description": "Client identification for grant requests.\n\nWhen sending a non-continuation request to the AS, the client instance MUST identify itself by including the client field of the request and by signing the request.\n\nCan be either:\n- A wallet address string (backwards compatible format)\n- An object with either `jwk` (for directed identity) or `walletAddress` (mutually exclusive)\n\nWhen using a wallet address string or the `walletAddress` property:\nA JSON Web Key Set document, including the public key that the client instance will use to protect this request and any continuation requests at the AS and any user-facing information about the client instance used in interactions, MUST be available at the wallet address + `/jwks.json` url.\n\nWhen using the `jwk` property (directed identity approach):\nThe client instance provides its public key directly in the request, eliminating the need for the AS to fetch it from a wallet address. This approach enhances privacy by not requiring the client to expose a persistent wallet address identifier. The `jwk` property can only be used for non-interactive grant requests (i.e.: incoming payments).\n\nIf sending a grant initiation request that requires RO interaction, the wallet address MUST serve necessary client display information.",
         "oneOf": [
           {
+            "title": "Wallet address string (deprecated)",
             "type": "string",
             "format": "uri",
             "description": "DEPRECATED: This string format of the client wallet address is maintained only for backwards compatibility. Migrate to the object form with `jwk` or `walletAddress`.",
             "deprecated": true
           },
           {
+            "title": "Wallet address object",
             "type": "object",
             "required": [
               "walletAddress"
@@ -955,6 +961,7 @@
             "additionalProperties": false
           },
           {
+            "title": "Directed identity (JWK)",
             "type": "object",
             "required": [
               "jwk"
@@ -1081,6 +1088,7 @@
         "description": "Open Payments specific property that defines the limits under which outgoing payments can be created.",
         "anyOf": [
           {
+            "title": "No amount limit",
             "type": "object",
             "properties": {
               "receiver": {
@@ -1092,6 +1100,7 @@
             }
           },
           {
+            "title": "Debit amount limit",
             "type": "object",
             "properties": {
               "receiver": {
@@ -1110,6 +1119,7 @@
             ]
           },
           {
+            "title": "Receive amount limit",
             "type": "object",
             "properties": {
               "receiver": {
@@ -1130,6 +1140,7 @@
         ]
       },
       "error-invalid-client": {
+        "title": "Invalid client",
         "type": "object",
         "properties": {
           "error": {
@@ -1149,6 +1160,7 @@
         }
       },
       "error-invalid-request": {
+        "title": "Invalid request",
         "type": "object",
         "properties": {
           "error": {
@@ -1168,6 +1180,7 @@
         }
       },
       "error-request-denied": {
+        "title": "Request denied",
         "type": "object",
         "properties": {
           "error": {
@@ -1187,6 +1200,7 @@
         }
       },
       "error-too-fast": {
+        "title": "Too fast",
         "type": "object",
         "properties": {
           "error": {
@@ -1206,6 +1220,7 @@
         }
       },
       "error-invalid-continuation": {
+        "title": "Invalid continuation",
         "type": "object",
         "properties": {
           "error": {
@@ -1225,6 +1240,7 @@
         }
       },
       "error-invalid-rotation": {
+        "title": "Invalid rotation",
         "type": "object",
         "properties": {
           "error": {

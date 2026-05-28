@@ -7,7 +7,7 @@
       "name": "Apache 2.0",
       "identifier": "Apache-2.0"
     },
-    "description": "The Wallet Address API is a simple REST API to get basic details about a wallet address.",
+    "description": "The wallet address server exposes publicly accessible information about an Open Payments wallet address, including basic account details and the cryptographic keys used to verify requests from this wallet address.\n\n**Endpoints:**\n- `GET /` — retrieve public details for a wallet address\n- `GET /jwks.json` — retrieve the JSON Web Key Set (JWKS) for a wallet address\n\nFor an overview of wallet addresses and how they work in Open Payments, see [the Wallet addresses concepts page](https://openpayments.dev/concepts/wallet-addresses).",
     "contact": {
       "email": "tech@interledger.org"
     }
@@ -74,7 +74,7 @@
           }
         },
         "operationId": "get-wallet-address",
-        "description": "Retrieve the public information of the Wallet Address.\n\nThis end-point should be open to anonymous requests as it allows clients to verify a Wallet Address URL and get the basic information required to construct new transactions and discover the grant request URL.\n\nThe content should be slow changing and cacheable for long periods. Servers SHOULD use cache control headers.",
+        "description": "Retrieve the public information of the Wallet Address.\n\nThis endpoint should be open to anonymous requests as it allows clients to verify a Wallet Address URL and get the basic information required to construct new transactions and discover the grant request URL.\n\nThe content should be slow changing and cacheable for long periods. Servers SHOULD use cache control headers.",
         "security": [],
         "x-internal": false
       }
@@ -103,32 +103,6 @@
         },
         "operationId": "get-wallet-address-keys",
         "description": "Retrieve the public keys of the Wallet Address.",
-        "security": []
-      }
-    },
-    "/did.json": {
-      "get": {
-        "summary": "Get the DID Document for this wallet",
-        "tags": [
-          "wallet-address"
-        ],
-        "responses": {
-          "200": {
-            "description": "DID Document Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/did-document"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "DID Document not yet implemented"
-          }
-        },
-        "operationId": "get-wallet-address-did-document",
-        "description": "Retrieve the DID Document of the Wallet Address.",
         "security": []
       }
     }
@@ -231,7 +205,8 @@
         "type": "object",
         "properties": {
           "kid": {
-            "type": "string"
+            "type": "string",
+            "description": "A unique identifier for the key."
           },
           "alg": {
             "type": "string",
@@ -242,18 +217,21 @@
           },
           "use": {
             "type": "string",
+            "description": "The intended use of the key. The only allowed value is `sig` (signature).",
             "enum": [
               "sig"
             ]
           },
           "kty": {
             "type": "string",
+            "description": "The key type. Identifies the cryptographic algorithm family. The only allowed value is `OKP` (Octet Key Pair).",
             "enum": [
               "OKP"
             ]
           },
           "crv": {
             "type": "string",
+            "description": "The cryptographic curve used with the key. The only allowed value is `Ed25519`.",
             "enum": [
               "Ed25519"
             ]
@@ -289,12 +267,6 @@
             "x": "oy0L_vTygNE4IogRyn_F5GmHXdqYVjIXkWs2jky7zsI"
           }
         ]
-      },
-      "did-document": {
-        "type": "object",
-        "additionalProperties": true,
-        "title": "DID Document",
-        "description": "A DID Document using JSON encoding"
       }
     }
   }

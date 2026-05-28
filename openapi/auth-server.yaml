@@ -6,7 +6,17 @@ info:
     name: Apache 2.0
     identifier: Apache-2.0
   summary: Open Payments Authorization Server
-  description: 'The Open Payments API is secured via [GNAP](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol). This specification describes the Open Payments Authorization Server API, which is an opinionated GNAP Server API.'
+  description: |-
+    The authorization server handles grant requests and access token management for the Open Payments protocol, using [GNAP](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol) (Grant Negotiation and Authorization Protocol).
+
+    **Endpoints:**
+    - `POST /` — initiate a grant request
+    - `POST /continue/{id}` — continue a pending grant request
+    - `DELETE /continue/{id}` — cancel a pending grant request
+    - `POST /token/{id}` — rotate an access token
+    - `DELETE /token/{id}` — revoke an access token
+
+    For an overview of how Open Payments authorization works, see [the Authorization concepts page](https://openpayments.dev/concepts/auth/).
   contact:
     email: tech@interledger.org
 servers:
@@ -28,7 +38,8 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - properties:
+                  - title: Pending interaction
+                    properties:
                       interact:
                         $ref: '#/components/schemas/interact-response'
                       continue:
@@ -36,7 +47,8 @@ paths:
                     required:
                       - interact
                       - continue
-                  - properties:
+                  - title: Approved
+                    properties:
                       access_token:
                         $ref: '#/components/schemas/access_token'
                       continue:
@@ -177,6 +189,7 @@ paths:
         name: id
         in: path
         required: true
+        description: The unique reference ID of the grant request continuation.
     post:
       summary: Continuation Request
       operationId: post-continue
@@ -307,6 +320,7 @@ paths:
         name: id
         in: path
         required: true
+        description: The unique reference of the access token to be managed.
     post:
       summary: Rotate Access Token
       operationId: post-token
@@ -603,11 +617,13 @@ components:
 
         If sending a grant initiation request that requires RO interaction, the wallet address MUST serve necessary client display information.
       oneOf:
-        - type: string
+        - title: Wallet address string (deprecated)
+          type: string
           format: uri
           description: 'DEPRECATED: This string format of the client wallet address is maintained only for backwards compatibility. Migrate to the object form with `jwk` or `walletAddress`.'
           deprecated: true
-        - type: object
+        - title: Wallet address object
+          type: object
           required: [walletAddress]
           properties:
             walletAddress:
@@ -615,7 +631,8 @@ components:
               format: uri
               description: Wallet address of the client instance that is making this request.
           additionalProperties: false
-        - type: object
+        - title: Directed identity (JWK)
+          type: object
           required: [jwk]
           properties:
             jwk:
@@ -704,13 +721,15 @@ components:
       title: limits-outgoing
       description: Open Payments specific property that defines the limits under which outgoing payments can be created.
       anyOf:
-        - type: object
+        - title: No amount limit
+          type: object
           properties:
             receiver:
               $ref: '#/components/schemas/receiver'
             interval:
               $ref: '#/components/schemas/interval'
-        - type: object
+        - title: Debit amount limit
+          type: object
           properties:
             receiver:
               $ref: '#/components/schemas/receiver'
@@ -721,7 +740,8 @@ components:
               $ref: '#/components/schemas/amount'
           required:
             - debitAmount
-        - type: object
+        - title: Receive amount limit
+          type: object
           properties:
             receiver:
               $ref: '#/components/schemas/receiver'
@@ -733,6 +753,7 @@ components:
           required:
             - receiveAmount
     error-invalid-client:
+      title: Invalid client
       type: object
       properties:
         error:
@@ -745,6 +766,7 @@ components:
               enum:
                 - invalid_client
     error-invalid-request:
+      title: Invalid request
       type: object
       properties:
         error:
@@ -757,6 +779,7 @@ components:
               enum:
                 - invalid_request
     error-request-denied:
+      title: Request denied
       type: object
       properties:
         error:
@@ -769,6 +792,7 @@ components:
               enum:
                 - request_denied
     error-too-fast:
+      title: Too fast
       type: object
       properties:
         error:
@@ -781,6 +805,7 @@ components:
               enum:
                 - too_fast
     error-invalid-continuation:
+      title: Invalid continuation
       type: object
       properties:
         error:
@@ -793,6 +818,7 @@ components:
               enum:
                 - invalid_continuation
     error-invalid-rotation:
+      title: Invalid rotation
       type: object
       properties:
         error:
