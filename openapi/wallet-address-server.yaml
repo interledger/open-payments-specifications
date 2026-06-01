@@ -1,12 +1,16 @@
 openapi: 3.1.0
 info:
   title: Wallet Address API
-  version: '1.3.1'
+  version: '1.3.2'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
   description: |-
-    The Wallet Address API is a simple REST API to get basic details about a wallet address.
+    The wallet address server exposes publicly accessible information about an Open Payments wallet address, including basic account details and the cryptographic keys used to verify requests from this wallet address.
+
+    **Endpoints:**
+    - `GET /` — retrieve public details for a wallet address
+    - `GET /jwks.json` — retrieve the JSON Web Key Set (JWKS) for a wallet address
   contact:
     email: tech@interledger.org
 servers:
@@ -52,7 +56,7 @@ paths:
       description: |-
         Retrieve the public information of the Wallet Address.
 
-        This end-point should be open to anonymous requests as it allows clients to verify a Wallet Address URL and get the basic information required to construct new transactions and discover the grant request URL.
+        This endpoint should be open to anonymous requests as it allows clients to verify a Wallet Address URL and get the basic information required to construct new transactions and discover the grant request URL.
 
         The content should be slow changing and cacheable for long periods. Servers SHOULD use cache control headers.
       security: []
@@ -74,23 +78,6 @@ paths:
           description: JWKS Document Not Found
       operationId: get-wallet-address-keys
       description: Retrieve the public keys of the Wallet Address.
-      security: []
-  /did.json:
-    get:
-      summary: Get the DID Document for this wallet
-      tags:
-        - wallet-address
-      responses:
-        '200':
-          description: DID Document Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/did-document'
-        '500':
-          description: DID Document not yet implemented
-      operationId: get-wallet-address-did-document
-      description: Retrieve the DID Document of the Wallet Address.
       security: []
 components:
   schemas:
@@ -168,6 +155,7 @@ components:
       properties:
         kid:
           type: string
+          description: A unique identifier for the key.
         alg:
           type: string
           description: 'The cryptographic algorithm family used with the key. The only allowed value is `EdDSA`. '
@@ -175,14 +163,17 @@ components:
             - EdDSA
         use:
           type: string
+          description: The intended use of the key. The only allowed value is `sig` (signature).
           enum:
             - sig
         kty:
           type: string
+          description: The key type. Identifies the cryptographic algorithm family. The only allowed value is `OKP` (Octet Key Pair).
           enum:
             - OKP
         crv:
           type: string
+          description: The cryptographic curve used with the key. The only allowed value is `Ed25519`.
           enum:
             - Ed25519
         x:
@@ -208,8 +199,3 @@ components:
           kty: OKP
           crv: Ed25519
           x: oy0L_vTygNE4IogRyn_F5GmHXdqYVjIXkWs2jky7zsI
-    did-document:
-      type: object
-      additionalProperties: true
-      title: DID Document
-      description: A DID Document using JSON encoding
