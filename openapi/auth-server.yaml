@@ -15,8 +15,6 @@ info:
     - `DELETE /continue/{id}` — cancel a pending grant request
     - `POST /token/{id}` — rotate an access token
     - `DELETE /token/{id}` — revoke an access token
-
-    For an overview of how Open Payments authorization works, see [the Authorization concepts page](https://openpayments.dev/concepts/auth/).
   contact:
     email: tech@interledger.org
 servers:
@@ -617,11 +615,6 @@ components:
 
         If sending a grant initiation request that requires RO interaction, the wallet address MUST serve necessary client display information.
       oneOf:
-        - title: Wallet address string (deprecated)
-          type: string
-          format: uri
-          description: 'DEPRECATED: This string format of the client wallet address is maintained only for backwards compatibility. Migrate to the object form with `jwk` or `walletAddress`.'
-          deprecated: true
         - title: Wallet address object
           type: object
           required: [walletAddress]
@@ -638,6 +631,11 @@ components:
             jwk:
               $ref: '#/components/schemas/json-web-key'
           additionalProperties: false
+        - title: Wallet address string (deprecated)
+          type: string
+          format: uri
+          description: 'DEPRECATED: This string format of the client wallet address is maintained only for backwards compatibility. Migrate to the object form with `jwk` or `walletAddress`.'
+          deprecated: true
     continue:
       title: continue
       type: object

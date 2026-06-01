@@ -7,7 +7,7 @@
       "name": "Apache 2.0",
       "identifier": "Apache-2.0"
     },
-    "description": "The wallet address server exposes publicly accessible information about an Open Payments wallet address, including basic account details and the cryptographic keys used to verify requests from this wallet address.\n\n**Endpoints:**\n- `GET /` — retrieve public details for a wallet address\n- `GET /jwks.json` — retrieve the JSON Web Key Set (JWKS) for a wallet address\n\nFor an overview of wallet addresses and how they work in Open Payments, see [the Wallet addresses concepts page](https://openpayments.dev/concepts/wallet-addresses).",
+    "description": "The wallet address server exposes publicly accessible information about an Open Payments wallet address, including basic account details and the cryptographic keys used to verify requests from this wallet address.\n\n**Endpoints:**\n- `GET /` — retrieve public details for a wallet address\n- `GET /jwks.json` — retrieve the JSON Web Key Set (JWKS) for a wallet address",
     "contact": {
       "email": "tech@interledger.org"
     }

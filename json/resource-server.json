@@ -7,7 +7,7 @@
       "name": "Apache 2.0",
       "identifier": "Apache-2.0"
     },
-    "description": "The resource server manages the core transaction resources of the Open Payments protocol: incoming payments, outgoing payments, and quotes. All resources are scoped to a wallet address and require an access token issued by the authorization server.\n\n**Endpoints:**\n- `/incoming-payments` — create and manage incoming payments\n- `/outgoing-payments` — create and manage outgoing payment instructions\n- `/quotes` — request a quote for a specific send or receive amount\n\nFor a full overview of these resources, see [the Resources concepts page](https://openpayments.dev/concepts/resources).",
+    "description": "The resource server manages the core transaction resources of the Open Payments protocol: incoming payments, outgoing payments, and quotes. All resources are scoped to a wallet address and require an access token issued by the authorization server.\n\n**Endpoints:**\n- `/incoming-payments` — create and manage incoming payments\n- `/outgoing-payments` — create and manage outgoing payment instructions\n- `/outgoing-payment-grant` — retrieve spent amounts for the current outgoing payment grant\n- `/quotes` — request a quote for a specific send or receive amount",
     "summary": "An API for open access to financial accounts to send and receive payments.",
     "contact": {
       "email": "tech@interledger.org"
