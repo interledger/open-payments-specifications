@@ -64,7 +64,7 @@ jobs:
             - [ ] Review the changes in the latest specification
             - [ ] Update the SDK to maintain feature compatibility
             - [ ] Release a new version of the SDK
-            - [ ] If applicable, add or update SDK snippets in the Open Payments documentation
+            - [ ] If applicable, you will be assigned an issue to add or update snippets in the Open Payments docs by the technical writing team
 
             <details>
             <summary><b>View Release Notes</b></summary>
@@ -99,11 +99,11 @@ jobs:
             if (createdIssueUrls.length > 0) {
               try {
                 console.log('Creating summary issue in interledger/open-payments');
-                const statusIssueBody = `## SDK Update Status for Open Payments Specification v${version}
+                const statusIssueBody = `## SDK Update Status
 
-                A new version of the specifications has been released: [${release.tag_name}](${release.html_url}).\n
+                This issue tracks the SDK updates for the new version of the specifications: [${release.tag_name}](${release.html_url}).\n
                 
-                The following issues have been created in the SDK repositories to track the required updates:
+                ### Issues
 
                 ${createdIssueUrls.map(issueUrl => `- [ ] ${issueUrl}`).join('\n')}
 
