@@ -3,29 +3,38 @@ name: Notify SDK repositories on minor version update
 on:
   release:
     types: [published]
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
 
 jobs:
   notify-sdks:
     runs-on: ubuntu-latest
     if: |
-      !github.event.release.draft &&
-      !github.event.release.prerelease
+      github.event_name == 'workflow_dispatch' || 
+      github.event_name == 'push' ||
+      (!github.event.release.draft && !github.event.release.prerelease)
     steps:
       - name: Check version
         id: check-version
         run: |
-          tag_name="${{ github.event.release.tag_name }}"
-          
-          read major minor patch <<< $(echo "$tag_name" | sed 's/^v//' | awk -F'[.v-]' '{print $1, $2, $3}')
-          
-          echo "Version: $tag_name (major: $major, minor: $minor, patch: $patch)"
-          
-          # Check if it's a minor or major update (patch version is 0)
-          if [ "$patch" == "0" ]; then
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] || [ "${{ github.event_name }}" == "push" ]; then
             echo "at_least_minor_version_update=true" >> "$GITHUB_OUTPUT"
-            echo "version=${tag_name#v}" >> "$GITHUB_OUTPUT"
+            echo "version=1.x.x" >> "$GITHUB_OUTPUT"
           else
-            echo "at_least_minor_version_update=false" >> "$GITHUB_OUTPUT"
+            tag_name="${{ github.event.release.tag_name }}"
+            read major minor patch <<< $(echo "$tag_name" | sed 's/^v//' | awk -F'[.v-]' '{print $1, $2, $3}')
+            
+            echo "Version: $tag_name (major: $major, minor: $minor, patch: $patch)"
+            
+            # Check if it's a minor or major update (patch version is 0)
+            if [ "$patch" == "0" ]; then
+              echo "at_least_minor_version_update=true" >> "$GITHUB_OUTPUT"
+              echo "version=${tag_name#v}" >> "$GITHUB_OUTPUT"
+            else
+              echo "at_least_minor_version_update=false" >> "$GITHUB_OUTPUT"
+            fi
           fi
 
       - name: Create issues in SDK repositories
@@ -34,21 +43,31 @@ jobs:
         with:
           github-token: ${{ secrets.SDK_REPO_NOTIFIER_TOKEN }}
           script: |
-            const repos = [
-              "open-payments-node",
-              "open-payments-rust",
-              "open-payments-php",
-              "open-payments-dotnet",
-              "open-payments-java",
-              "open-payments-go"
-            ];
+            // Use mock data if triggered via workflow_dispatch/push, otherwise use real release data
+            const release = context.payload.release || {
+              tag_name: "v1.x.x",
+              html_url: "https://github.com/interledger/open-payments-specifications/releases",
+              body: "This is a test release body for the SDK notifier."
+            };
             
             const version = "${{ steps.check-version.outputs.version }}";
-            const release = context.payload.release;
+            const isTest = ["workflow_dispatch", "push"].includes(context.eventName);
             
-            const body = `## Specification Update: v${version}
+            // Limit repos to open-payments-node for testing
+            const repos = isTest 
+              ? ["open-payments-node"] 
+              : [
+                  "open-payments-node",
+                  "open-payments-rust",
+                  "open-payments-php",
+                  "open-payments-dotnet",
+                  "open-payments-java",
+                  "open-payments-go"
+                ];
+            
+            const body = `## Specification Update
 
-            A new version of the **Open Payments specifications** [${release.tag_name}](${release.html_url}) has been released. Please update the SDK to maintain feature compatibility.
+            A new version of the Open Payments specifications has been released: [${release.tag_name}](${release.html_url}).
 
             ### Todo
             - [ ] Review the changes in the latest specification
@@ -64,16 +83,20 @@ jobs:
             </details>
 
             ---
-            *This issue was automatically created by the **SDK Repo Notifier** workflow in [interledger/open-payments-specifications](https://github.com/interledger/open-payments-specifications).*`;
+            *This issue was automatically created by the SDK Repo Notifier workflow in [interledger/open-payments-specifications](https://github.com/interledger/open-payments-specifications).*`;
 
             for (const sdkRepo of repos) {
               try {
+                const title_prefix = isTest ? "[TEST] " : "";
                 console.log(`Creating issue in interledger/${sdkRepo}`);
                 await github.rest.issues.create({
                   owner: 'interledger',
                   repo: sdkRepo,
-                  title: `Update Open Payments SDK to Specification v${version}`,
-                  body
+                  title: `${title_prefix}Update to Open Payments Specification v${version}`,
+                  body,
+                  headers: {
+                    'X-GitHub-Api-Version': '2026-03-10'
+                  }
                 });
               } catch (error) {
                 core.error(`Failed to create issue in interledger/${sdkRepo}: ${error.message}`);
