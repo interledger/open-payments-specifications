@@ -65,10 +65,12 @@ jobs:
             ---
             *This issue was automatically created by the SDK Repo Notifier workflow in [interledger/open-payments-specifications](https://github.com/interledger/open-payments-specifications).*`;
 
+            const createdIssues = [];
+
             for (const sdkRepo of repos) {
               try {
                 console.log(`Creating issue in interledger/${sdkRepo}`);
-                await github.rest.issues.create({
+                const { data: issue } = await github.rest.issues.create({
                   owner: 'interledger',
                   repo: sdkRepo,
                   title: `Update to Open Payments Specification v${version}`,
@@ -77,7 +79,36 @@ jobs:
                     'X-GitHub-Api-Version': '2026-03-10'
                   }
                 });
+                createdIssues.push({ repo: sdkRepo, url: issue.html_url });
               } catch (error) {
                 core.error(`Failed to create issue in interledger/${sdkRepo}: ${error.message}`);
+              }
+            }
+
+            if (createdIssues.length > 0) {
+              try {
+                console.log('Creating summary issue in interledger/open-payments');
+                const statusBody = `## SDK Update Status for Open Payments Specification v${version}
+
+                A new version of the specifications has been released: [${release.tag_name}](${release.html_url}).
+
+                The following issues have been created in the SDK repositories to track the required updates:
+
+                ${createdIssues.map(issue => `- [ ] interledger/${issue.repo}: ${issue.url}`).join('\n')}
+
+                ---
+                *This issue was automatically created by the SDK Repo Notifier workflow.*`;
+
+                await github.rest.issues.create({
+                  owner: 'interledger',
+                  repo: 'open-payments',
+                  title: `SDK updates for Open Payments Specification v${version}`,
+                  body: statusBody,
+                  headers: {
+                    'X-GitHub-Api-Version': '2026-03-10'
+                  }
+                });
+              } catch (error) {
+                core.error(`Failed to create summary issue in interledger/open-payments: ${error.message}`);
               }
             }
