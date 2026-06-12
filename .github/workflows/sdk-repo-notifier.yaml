@@ -1,0 +1,81 @@
+name: Notify SDK repositories on minor version update
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify-sdks:
+    runs-on: ubuntu-latest
+    if: |
+      !github.event.release.draft &&
+      !github.event.release.prerelease
+    steps:
+      - name: Check version
+        id: check-version
+        run: |
+          tag_name="${{ github.event.release.tag_name }}"
+          
+          read major minor patch <<< $(echo "$tag_name" | sed 's/^v//' | awk -F'[.v-]' '{print $1, $2, $3}')
+          
+          echo "Version: $tag_name (major: $major, minor: $minor, patch: $patch)"
+          
+          # Check if it's a minor or major update (patch version is 0)
+          if [ "$patch" == "0" ]; then
+            echo "at_least_minor_version_update=true" >> "$GITHUB_OUTPUT"
+            echo "version=${tag_name#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "at_least_minor_version_update=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create issues in SDK repositories
+        if: steps.check-version.outputs.at_least_minor_version_update == 'true'
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.SDK_REPO_NOTIFIER_TOKEN }}
+          script: |
+            const repos = [
+              "open-payments-node",
+              "open-payments-rust",
+              "open-payments-php",
+              "open-payments-dotnet",
+              "open-payments-java",
+              "open-payments-go"
+            ];
+            
+            const version = "${{ steps.check-version.outputs.version }}";
+            const release = context.payload.release;
+            
+            const body = `## Specification Update: v${version}
+
+            A new version of the **Open Payments specifications** [${release.tag_name}](${release.html_url}) has been released. Please update the SDK to maintain feature compatibility.
+
+            ### Todo
+            - [ ] Review the changes in the latest specification
+            - [ ] Update the SDK to maintain feature compatibility
+            - [ ] Release a new version of the SDK
+            - [ ] If applicable, add or update SDK snippets in the Open Payments documentation
+
+            <details>
+            <summary><b>View Release Notes</b></summary>
+
+            ${release.body}
+
+            </details>
+
+            ---
+            *This issue was automatically created by the **SDK Repo Notifier** workflow in [interledger/open-payments-specifications](https://github.com/interledger/open-payments-specifications).*`;
+
+            for (const sdkRepo of repos) {
+              try {
+                console.log(`Creating issue in interledger/${sdkRepo}`);
+                await github.rest.issues.create({
+                  owner: 'interledger',
+                  repo: sdkRepo,
+                  title: `Update Open Payments SDK to Specification v${version}`,
+                  body
+                });
+              } catch (error) {
+                core.error(`Failed to create issue in interledger/${sdkRepo}: ${error.message}`);
+              }
+            }
