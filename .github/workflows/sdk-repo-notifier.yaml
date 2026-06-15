@@ -1,4 +1,4 @@
-name: Notify SDK repositories on minor version update
+name: Notify SDK repositories on major/minor version update
 
 on:
   release:
@@ -46,6 +46,9 @@ jobs:
             
             const version = process.env.VERSION;
             const release = context.payload.release;
+            const headers = {
+              'X-GitHub-Api-Version': '2026-03-10'
+            };
             
             const body = `## Specification Update
 
@@ -70,16 +73,28 @@ jobs:
             const createdIssueUrls = [];
 
             for (const sdkRepo of repos) {
+              const issueTitle = `Update to Open Payments Specification v${version}`;
               try {
+                // Check if issue already exists
+                const { data: { items: existingIssues } } = await github.rest.search.issuesAndPullRequests({
+                  q: `repo:interledger/${sdkRepo} is:issue "${issueTitle}" in:title`,
+                  headers
+                });
+
+                const existingIssue = existingIssues.find(i => i.title === issueTitle);
+                if (existingIssue) {
+                   console.log(`Issue already exists in interledger/${sdkRepo}: ${existingIssue.html_url}`);
+                   createdIssueUrls.push(existingIssue.html_url);
+                   continue;
+                }
+
                 console.log(`Creating issue in interledger/${sdkRepo}`);
                 const { data: issue } = await github.rest.issues.create({
                   owner: 'interledger',
                   repo: sdkRepo,
-                  title: `Update to Open Payments Specification v${version}`,
+                  title: issueTitle,
                   body,
-                  headers: {
-                    'X-GitHub-Api-Version': '2026-03-10'
-                  }
+                  headers
                 });
                 createdIssueUrls.push(issue.html_url);
               } catch (error) {
@@ -89,7 +104,7 @@ jobs:
 
             if (createdIssueUrls.length > 0) {
               try {
-                console.log('Creating summary issue in interledger/open-payments');
+                const summaryTitle = `SDK updates for Open Payments Specification v${version}`;
                 const statusIssueBody = `## SDK Update Status
 
                 This issue tracks the SDK updates for the new version of the specifications: [${release.tag_name}](${release.html_url}).\n
@@ -100,16 +115,33 @@ jobs:
 
                 ---
                 *This issue was automatically created by the SDK Repo Notifier workflow.*`.replace(/^\s+/gm, '');
-
-                await github.rest.issues.create({
-                  owner: 'interledger',
-                  repo: 'open-payments',
-                  title: `SDK updates for Open Payments Specification v${version}`,
-                  body: statusIssueBody,
-                  headers: {
-                    'X-GitHub-Api-Version': '2026-03-10'
-                  }
+                
+                // Check if summary issue already exists
+                const { data: { items: existingSummaries } } = await github.rest.search.issuesAndPullRequests({
+                  q: `repo:interledger/open-payments is:issue "${summaryTitle}" in:title`,
+                  headers
                 });
+
+                const existingSummary = existingSummaries.find(i => i.title === summaryTitle);
+                if (existingSummary) {
+                  console.log(`Updating existing summary issue in interledger/open-payments: ${existingSummary.html_url}`);
+                  await github.rest.issues.update({
+                    owner: 'interledger',
+                    repo: 'open-payments',
+                    issue_number: existingSummary.number,
+                    body: statusIssueBody,
+                    headers
+                  });
+                } else {
+                  console.log('Creating summary issue in interledger/open-payments');
+                  await github.rest.issues.create({
+                    owner: 'interledger',
+                    repo: 'open-payments',
+                    title: summaryTitle,
+                    body: statusIssueBody,
+                    headers
+                  });
+                }
               } catch (error) {
                 core.error(`Failed to create summary issue in interledger/open-payments: ${error.message}`);
               }
