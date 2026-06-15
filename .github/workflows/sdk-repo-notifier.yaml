@@ -30,6 +30,8 @@ jobs:
       - name: Create issues in SDK repositories
         if: steps.check-version.outputs.at_least_minor_version_update == 'true'
         uses: actions/github-script@v9
+        env:
+          VERSION: ${{ steps.check-version.outputs.version }}
         with:
           github-token: ${{ secrets.SDK_REPO_NOTIFIER_TOKEN }}
           script: |
@@ -42,7 +44,7 @@ jobs:
               "open-payments-go"
             ];
             
-            const version = "${{ steps.check-version.outputs.version }}";
+            const version = process.env.VERSION;
             const release = context.payload.release;
             
             const body = `## Specification Update
