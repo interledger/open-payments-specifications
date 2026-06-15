@@ -3,32 +3,24 @@ name: Notify SDK repositories on major/minor version update
 on:
   release:
     types: [published]
-  push:
 
 jobs:
   notify-sdks:
     runs-on: ubuntu-latest
     if: |
-      github.event_name != 'release' || (
-        !github.event.release.draft &&
-        !github.event.release.prerelease
-      )
+      !github.event.release.draft &&
+      !github.event.release.prerelease
     steps:
       - name: Check version
         id: check-version
         run: |
-          if [ "${{ github.event_name }}" == "push" ]; then
-            tag_name="v1.x.0"
-          else
-            tag_name="${{ github.event.release.tag_name }}"
-          fi
-          
+          tag_name="${{ github.event.release.tag_name }}"
           read major minor patch <<< $(echo "$tag_name" | sed 's/^v//' | awk -F'[.v-]' '{print $1, $2, $3}')
           
           echo "Version: $tag_name (major: $major, minor: $minor, patch: $patch)"
           
-          # Check if it's a minor or major update (patch version is 0) or if manually triggered/push
-          if [ "$patch" == "0" ] || [ "${{ github.event_name }}" != "release" ]; then
+          # Check if it's a minor or major update (patch version is 0)
+          if [ "$patch" == "0" ]; then
             echo "at_least_minor_version_update=true" >> "$GITHUB_OUTPUT"
             echo "version=${tag_name#v}" >> "$GITHUB_OUTPUT"
           else
@@ -40,11 +32,10 @@ jobs:
         uses: actions/github-script@v9
         env:
           VERSION: ${{ steps.check-version.outputs.version }}
-          TEST_REPO: ${{ github.event_name == 'push' && 'open-payments-node' || '' }}
         with:
           github-token: ${{ secrets.SDK_REPO_NOTIFIER_TOKEN }}
           script: |
-            const repos = process.env.TEST_REPO ? [process.env.TEST_REPO] : [
+            const repos = [
               "open-payments-node",
               "open-payments-rust",
               "open-payments-php",
@@ -54,11 +45,7 @@ jobs:
             ];
             
             const version = process.env.VERSION;
-            const release = context.payload.release || {
-              tag_name: "v" + version,
-              html_url: `https://github.com/interledger/open-payments-specifications/releases/tag/v${version}`,
-              body: "Test release body generated via " + context.eventName
-            };
+            const release = context.payload.release;
             const headers = {
               'X-GitHub-Api-Version': '2026-03-10'
             };
