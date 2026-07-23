@@ -74,6 +74,19 @@
                         "access_token",
                         "continue"
                       ]
+                    },
+                    {
+                      "title": "Approved without continuation",
+                      "description": "Returned when the grant is approved and completed synchronously in-line, without a follow-up continuation step. Used by the `card` interaction method, where the credentials needed to approve the grant (`cardAuthorization`) are supplied in the initial request. The access token is returned directly and carries the card authorization result in `cardAuthorization`. The `continue` field MUST be absent, which distinguishes this response from the standard `Approved` response above.",
+                      "properties": {
+                        "access_token": {
+                          "$ref": "#/components/schemas/access_token"
+                        },
+                        "continue": false
+                      },
+                      "required": [
+                        "access_token"
+                      ]
                     }
                   ],
                   "type": "object"
@@ -116,6 +129,37 @@
                           "value": "33OMUKMKSKU80UPRY5NM"
                         },
                         "uri": "https://auth.interledger-test.dev/continue/4CF492MLVMSW9MKMXKHQ"
+                      }
+                    }
+                  },
+                  "Grant (card authorization, returned without continuation)": {
+                    "value": {
+                      "access_token": {
+                        "value": "OS9M2PMHKUR64TB8N6BW7OZB8CDFONP219RP1LT0",
+                        "manage": "https://auth.interledger-test.dev/token/dd17a202-9982-4ed9-ae31-564947fb6379",
+                        "expires_in": 3600,
+                        "access": [
+                          {
+                            "type": "outgoing-payment",
+                            "actions": [
+                              "create",
+                              "read"
+                            ],
+                            "identifier": "https://ilp.interledger-test.dev/alice",
+                            "limits": {
+                              "receiver": "https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7",
+                              "receiveAmount": {
+                                "value": "1000",
+                                "assetCode": "USD",
+                                "assetScale": 2
+                              }
+                            }
+                          }
+                        ],
+                        "cardAuthorization": {
+                          "tlvData": "8A023030...",
+                          "requestId": "018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b"
+                        }
                       }
                     }
                   }
@@ -201,6 +245,46 @@
                         "uri": "https://webmonize.com/return/876FGRD8VC",
                         "nonce": "4edb2194-dbdf-46bb-9397-d5fd57b7c8a7"
                       }
+                    }
+                  }
+                },
+                "Grant request for authorizing a card payment": {
+                  "value": {
+                    "access_token": {
+                      "access": [
+                        {
+                          "type": "outgoing-payment",
+                          "actions": [
+                            "create",
+                            "read"
+                          ],
+                          "identifier": "https://ilp.interledger-test.dev/alice",
+                          "limits": {
+                            "receiver": "https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7",
+                            "receiveAmount": {
+                              "value": "1000",
+                              "assetCode": "USD",
+                              "assetScale": 2
+                            }
+                          },
+                          "cardAuthorization": {
+                            "tlvData": "9F26089F27019F1002...",
+                            "pinBlock": "23e412341234",
+                            "pwk": {
+                              "key": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+                              "kvc": "A3F1C2",
+                              "iv": "00000000000000000000000000000000"
+                            },
+                            "requestId": "018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b"
+                          }
+                        }
+                      ]
+                    },
+                    "client": "https://merchant.example.com/.well-known/pay",
+                    "interact": {
+                      "start": [
+                        "card"
+                      ]
                     }
                   }
                 },
@@ -867,6 +951,9 @@
           },
           "limits": {
             "$ref": "#/components/schemas/limits-outgoing"
+          },
+          "cardAuthorization": {
+            "$ref": "#/components/schemas/card-authorization-request"
           }
         },
         "required": [
@@ -925,6 +1012,9 @@
           },
           "access": {
             "$ref": "#/components/schemas/access"
+          },
+          "cardAuthorization": {
+            "$ref": "#/components/schemas/card-authorization-response"
           }
         },
         "required": [
@@ -1017,7 +1107,8 @@
             "items": {
               "type": "string",
               "enum": [
-                "redirect"
+                "redirect",
+                "card"
               ]
             }
           },
@@ -1052,7 +1143,7 @@
         "required": [
           "start"
         ],
-        "description": "The client instance declares the parameters for interaction methods that it can support using the interact field."
+        "description": "The client instance declares the parameters for interaction methods that it can support using the interact field.\n\nThe `card` start method is used for card (EMV) payment authorization. Unlike `redirect`, it completes synchronously and in-line: the cardholder's consent (the online PIN) and card credentials are supplied in the initial request via the `cardAuthorization` field on the requested `outgoing-payment` access, so there is no redirect and no `finish` method. The grant is approved (or denied) as part of the same request and the access token is returned directly, without a continuation step."
       },
       "interact-response": {
         "title": "interact-response",
@@ -1138,6 +1229,80 @@
             ]
           }
         ]
+      },
+      "pin-working-key": {
+        "title": "pin-working-key",
+        "type": "object",
+        "description": "The PIN Working Key (PWK) used to encrypt the online PIN block. It is carried in-band and is itself wrapped under the Zone Master Key (ZMK) shared between the acquiring and issuing account servicing entities, so the issuer can import it on demand and translate the PIN block for verification in its HSM.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The PWK ciphertext, wrapped under the shared ZMK."
+          },
+          "kvc": {
+            "type": "string",
+            "description": "Key Check Value of the PWK, letting the issuer confirm it imported the correct key."
+          },
+          "iv": {
+            "type": "string",
+            "description": "The initialization vector used when wrapping the PWK."
+          }
+        },
+        "required": [
+          "key",
+          "kvc",
+          "iv"
+        ],
+        "additionalProperties": false
+      },
+      "card-authorization-request": {
+        "title": "card-authorization-request",
+        "type": "object",
+        "description": "Open Payments extension carrying the card (EMV) credentials the issuer needs to authorize a transaction. Present on the requested `outgoing-payment` access when the grant uses the `card` interaction method (`interact.start: [\"card\"]`).\n\nThe acquiring (merchant) side assembles this after decrypting the SRED-protected card data and translating the online PIN block in its HSM. Only the merchant's Open Payments client sends it; the point-of-sale device is never an Open Payments client.",
+        "properties": {
+          "tlvData": {
+            "type": "string",
+            "description": "Card data as EMV TLV (tag-length-value), decrypted from the SRED payload by the acquirer HSM. Sent as cleartext TLV for now; field-level encryption to the issuer's HSM-resident public key is a planned enhancement before production use."
+          },
+          "pinBlock": {
+            "type": "string",
+            "description": "The online PIN block, encrypted under the PIN Working Key (PWK)."
+          },
+          "pwk": {
+            "$ref": "#/components/schemas/pin-working-key"
+          },
+          "requestId": {
+            "type": "string",
+            "description": "Client-generated identifier for this authorization request. Replaying the same `requestId` MUST return the same result rather than authorizing again, so that PIN-try counters are not double-decremented and outgoing payments are not double-created."
+          }
+        },
+        "required": [
+          "tlvData",
+          "pinBlock",
+          "pwk",
+          "requestId"
+        ],
+        "additionalProperties": false
+      },
+      "card-authorization-response": {
+        "title": "card-authorization-response",
+        "type": "object",
+        "description": "Result of a card (EMV) authorization, returned inline on the access token when the grant used the `card` interaction method. Present because the `card` interaction completes synchronously.",
+        "properties": {
+          "tlvData": {
+            "type": "string",
+            "description": "The EMV authorization result as TLV, containing the Authorisation Response Code (ARC), the authorisation code, and the Authorisation Response Cryptogram (ARPC) produced by the issuer HSM. The acquirer relays the ARC and authorisation code to the point-of-sale device."
+          },
+          "requestId": {
+            "type": "string",
+            "description": "Echoes the `requestId` from the corresponding card authorization request."
+          }
+        },
+        "required": [
+          "tlvData",
+          "requestId"
+        ],
+        "additionalProperties": false
       },
       "error-invalid-client": {
         "title": "Invalid client",
