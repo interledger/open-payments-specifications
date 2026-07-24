@@ -81,12 +81,12 @@
                       "properties": {
                         "access_token": {
                           "$ref": "#/components/schemas/access_token"
-                        },
-                        "continue": false
+                        }
                       },
                       "required": [
                         "access_token"
-                      ]
+                      ],
+                      "additionalProperties": false
                     },
                     {
                       "title": "Completed without a grant",
@@ -98,7 +98,8 @@
                       },
                       "required": [
                         "cardAuthorization"
-                      ]
+                      ],
+                      "additionalProperties": false
                     }
                   ],
                   "type": "object"
@@ -179,7 +180,7 @@
                     "value": {
                       "cardAuthorization": {
                         "tlvData": "8A023531...",
-                        "requestId": "018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b"
+                        "requestId": "019a1f7c-2d4e-7a8b-b3c1-5e7f9a0c2d4e"
                       }
                     }
                   }
