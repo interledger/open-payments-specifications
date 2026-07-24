@@ -300,7 +300,7 @@
                         }
                       ]
                     },
-                    "client": "https://merchant.example.com/.well-known/pay",
+                    "client": "https://webmonize.com/.well-known/pay",
                     "interact": {
                       "start": [
                         "card"
@@ -334,7 +334,7 @@
                         }
                       ]
                     },
-                    "client": "https://merchant.example.com/.well-known/pay",
+                    "client": "https://webmonize.com/.well-known/pay",
                     "interact": {
                       "start": [
                         "card"

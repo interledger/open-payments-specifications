@@ -196,7 +196,7 @@ paths:
                             kvc: A3F1C2
                             iv: '00000000000000000000000000000000'
                           requestId: 018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b
-                  client: 'https://merchant.example.com/.well-known/pay'
+                  client: 'https://webmonize.com/.well-known/pay'
                   interact:
                     start:
                       - card
@@ -218,7 +218,7 @@ paths:
                         cardAuthorization:
                           tlvData: '9F26089F27019F1002...'
                           requestId: 018f8d31-9a2b-7c4d-8e1f-3b5d7f9a1c2e
-                  client: 'https://merchant.example.com/.well-known/pay'
+                  client: 'https://webmonize.com/.well-known/pay'
                   interact:
                     start:
                       - card
