@@ -90,7 +90,7 @@
                     },
                     {
                       "title": "Completed without a grant",
-                      "description": "The `card` interaction completed but the issuer declined the authorization (a business decline such as insufficient funds or a failed PIN). The card result — carrying the declining ARC — is returned in `cardAuthorization`, and no access token is granted.",
+                      "description": "The `card` interaction completed but the authorization was declined. The card result is returned in `cardAuthorization` and no access token is granted.",
                       "properties": {
                         "cardAuthorization": {
                           "$ref": "#/components/schemas/card-authorization-response"
@@ -1287,19 +1287,19 @@
       "pin-working-key": {
         "title": "pin-working-key",
         "type": "object",
-        "description": "The PIN Working Key (PWK) that encrypts the online PIN block, carried in-band wrapped under the Zone Master Key (ZMK) shared between the acquiring and issuing parties.",
+        "description": "The PIN Working Key (PWK) used to encrypt the PIN block.",
         "properties": {
           "key": {
             "type": "string",
-            "description": "The PWK ciphertext, wrapped under the shared ZMK."
+            "description": "The encrypted key material."
           },
           "kvc": {
             "type": "string",
-            "description": "Key Check Value of the PWK."
+            "description": "Key Check Value of the key."
           },
           "iv": {
             "type": "string",
-            "description": "Initialization vector used to wrap the PWK."
+            "description": "Initialization vector."
           }
         },
         "required": [
@@ -1312,15 +1312,15 @@
       "card-authorization-request": {
         "title": "card-authorization-request",
         "type": "object",
-        "description": "The card (EMV) credentials the issuer needs to authorize the transaction. Present on the requested outgoing-payment access when `interact.start` includes `card`.",
+        "description": "Card (EMV) credentials, present on the outgoing-payment access when `interact.start` includes `card`.",
         "properties": {
           "tlvData": {
             "type": "string",
-            "description": "Card data as EMV TLV, decrypted from the SRED payload by the acquirer."
+            "description": "Card data as EMV TLV."
           },
           "pinBlock": {
             "type": "string",
-            "description": "The online PIN block, encrypted under the PIN Working Key (PWK). Present only when the cardholder verification method was online PIN; omitted for no-CVM taps (e.g. low-value contactless)."
+            "description": "The PIN block, encrypted under the PIN Working Key (PWK). Omitted when no PIN was captured."
           },
           "pwk": {
             "$ref": "#/components/schemas/pin-working-key"
