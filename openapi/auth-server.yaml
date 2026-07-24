@@ -62,6 +62,13 @@ paths:
                       continue: false
                     required:
                       - access_token
+                  - title: Completed without a grant
+                    description: The `card` interaction completed but the issuer declined the authorization (a business decline such as insufficient funds or a failed PIN). The card result — carrying the declining ARC — is returned in `cardAuthorization`, and no access token is granted.
+                    properties:
+                      cardAuthorization:
+                        $ref: '#/components/schemas/card-authorization-response'
+                    required:
+                      - cardAuthorization
                 type: object
               examples:
                 Interaction instructions:
@@ -111,6 +118,11 @@ paths:
                       cardAuthorization:
                         tlvData: '8A023030...'
                         requestId: 018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b
+                Card authorization declined (no grant):
+                  value:
+                    cardAuthorization:
+                      tlvData: '8A023531...'
+                      requestId: 018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b
         '400':
           description: Bad Request
           content:
@@ -184,6 +196,28 @@ paths:
                             kvc: A3F1C2
                             iv: '00000000000000000000000000000000'
                           requestId: 018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b
+                  client: 'https://merchant.example.com/.well-known/pay'
+                  interact:
+                    start:
+                      - card
+              Grant request for a no-CVM card payment (no PIN):
+                value:
+                  access_token:
+                    access:
+                      - type: outgoing-payment
+                        actions:
+                          - create
+                          - read
+                        identifier: 'https://ilp.interledger-test.dev/alice'
+                        limits:
+                          receiver: 'https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7'
+                          receiveAmount:
+                            value: '250'
+                            assetCode: USD
+                            assetScale: 2
+                        cardAuthorization:
+                          tlvData: '9F26089F27019F1002...'
+                          requestId: 018f8d31-9a2b-7c4d-8e1f-3b5d7f9a1c2e
                   client: 'https://merchant.example.com/.well-known/pay'
                   interact:
                     start:
@@ -841,7 +875,7 @@ components:
           description: Card data as EMV TLV, decrypted from the SRED payload by the acquirer.
         pinBlock:
           type: string
-          description: The online PIN block, encrypted under the PIN Working Key (PWK).
+          description: The online PIN block, encrypted under the PIN Working Key (PWK). Present only when the cardholder verification method was online PIN; omitted for no-CVM taps (e.g. low-value contactless).
         pwk:
           $ref: '#/components/schemas/pin-working-key'
         requestId:
@@ -849,9 +883,10 @@ components:
           description: Client-generated identifier for the request; replaying it MUST return the same result rather than authorizing again.
       required:
         - tlvData
-        - pinBlock
-        - pwk
         - requestId
+      dependentRequired:
+        pinBlock:
+          - pwk
       additionalProperties: false
     card-authorization-response:
       title: card-authorization-response
