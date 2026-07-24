@@ -739,8 +739,7 @@ components:
             - nonce
       required:
         - start
-      description: |-
-        The client instance declares the parameters for interaction methods that it can support using the interact field. The `card` method authorizes a card (EMV) payment in-line: the credentials are supplied in the request via `cardAuthorization`, so the grant completes synchronously with no redirect and no continuation.
+      description: The client instance declares the parameters for interaction methods that it can support using the interact field.
     interact-response:
       title: interact-response
       type: object
