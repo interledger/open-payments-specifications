@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Open Payments",
-    "version": "1.3.2",
+    "version": "1.3.3",
     "license": {
       "name": "Apache 2.0",
       "identifier": "Apache-2.0"
@@ -1114,136 +1114,151 @@
       "create-outgoing-payment-request": {
         "oneOf": [
           {
-            "title": "From quote",
-            "type": "object",
-            "properties": {
-              "walletAddress": {
-                "$ref": "#/components/schemas/walletAddress"
-              },
-              "quoteId": {
-                "type": "string",
-                "format": "uri",
-                "description": "The URL of the quote defining this payment's amounts."
-              },
-              "metadata": {
-                "type": "object",
-                "additionalProperties": true,
-                "description": "Additional metadata associated with the outgoing payment. (Optional)"
-              }
-            },
-            "required": [
-              "quoteId",
-              "walletAddress"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/create-outgoing-payment-request-from-quote"
           },
           {
-            "title": "From incoming payment",
-            "type": "object",
-            "properties": {
-              "walletAddress": {
-                "$ref": "#/components/schemas/walletAddress"
-              },
-              "incomingPayment": {
-                "type": "string",
-                "format": "uri",
-                "description": "The URL of the incoming payment this outgoing payment will fulfill."
-              },
-              "debitAmount": {
-                "description": "The fixed amount that would be sent from the sending wallet address given a successful outgoing payment.",
-                "$ref": "#/components/schemas/amount"
-              },
-              "metadata": {
-                "type": "object",
-                "additionalProperties": true,
-                "description": "Additional metadata associated with the outgoing payment. (Optional)"
-              }
-            },
-            "required": [
-              "incomingPayment",
-              "debitAmount",
-              "walletAddress"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/create-outgoing-payment-request-from-incoming-payment"
           }
         ]
       },
       "create-quote-request": {
         "oneOf": [
           {
-            "title": "Receiver with incoming amount",
-            "description": "Create quote for an `receiver` that is an Incoming Payment with an `incomingAmount`",
-            "properties": {
-              "walletAddress": {
-                "$ref": "#/components/schemas/walletAddress"
-              },
-              "receiver": {
-                "$ref": "#/components/schemas/receiver"
-              },
-              "method": {
-                "$ref": "#/components/schemas/payment-method"
-              }
-            },
-            "required": [
-              "walletAddress",
-              "receiver",
-              "method"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/create-quote-request-by-receiver"
           },
           {
-            "title": "With fixed-receive amount",
-            "description": "Create a quote with a fixed-receive amount",
-            "properties": {
-              "walletAddress": {
-                "$ref": "#/components/schemas/walletAddress"
-              },
-              "receiver": {
-                "$ref": "#/components/schemas/receiver"
-              },
-              "method": {
-                "$ref": "#/components/schemas/payment-method"
-              },
-              "receiveAmount": {
-                "description": "The fixed amount that would be paid into the receiving wallet address given a successful outgoing payment.",
-                "$ref": "#/components/schemas/amount"
-              }
-            },
-            "required": [
-              "walletAddress",
-              "receiver",
-              "method",
-              "receiveAmount"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/create-quote-request-with-receive-amount"
           },
           {
-            "title": "With fixed-send amount",
-            "description": "Create a quote with a fixed-send amount",
-            "properties": {
-              "walletAddress": {
-                "$ref": "#/components/schemas/walletAddress"
-              },
-              "receiver": {
-                "$ref": "#/components/schemas/receiver"
-              },
-              "method": {
-                "$ref": "#/components/schemas/payment-method"
-              },
-              "debitAmount": {
-                "description": "The fixed amount that would be sent from the sending wallet address given a successful outgoing payment.",
-                "$ref": "#/components/schemas/amount"
-              }
-            },
-            "required": [
-              "walletAddress",
-              "receiver",
-              "method",
-              "debitAmount"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/create-quote-request-with-debit-amount"
           }
         ]
+      },
+      "create-outgoing-payment-request-from-quote": {
+        "title": "From quote",
+        "type": "object",
+        "properties": {
+          "walletAddress": {
+            "$ref": "#/components/schemas/walletAddress"
+          },
+          "quoteId": {
+            "type": "string",
+            "format": "uri",
+            "description": "The URL of the quote defining this payment's amounts."
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional metadata associated with the outgoing payment. (Optional)"
+          }
+        },
+        "required": [
+          "quoteId",
+          "walletAddress"
+        ],
+        "additionalProperties": false
+      },
+      "create-outgoing-payment-request-from-incoming-payment": {
+        "title": "From incoming payment",
+        "type": "object",
+        "properties": {
+          "walletAddress": {
+            "$ref": "#/components/schemas/walletAddress"
+          },
+          "incomingPayment": {
+            "type": "string",
+            "format": "uri",
+            "description": "The URL of the incoming payment this outgoing payment will fulfill."
+          },
+          "debitAmount": {
+            "description": "The fixed amount that would be sent from the sending wallet address given a successful outgoing payment.",
+            "$ref": "#/components/schemas/amount"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional metadata associated with the outgoing payment. (Optional)"
+          }
+        },
+        "required": [
+          "incomingPayment",
+          "debitAmount",
+          "walletAddress"
+        ],
+        "additionalProperties": false
+      },
+      "create-quote-request-by-receiver": {
+        "title": "Receiver with incoming amount",
+        "description": "Create quote for an `receiver` that is an Incoming Payment with an `incomingAmount`",
+        "properties": {
+          "walletAddress": {
+            "$ref": "#/components/schemas/walletAddress"
+          },
+          "receiver": {
+            "$ref": "#/components/schemas/receiver"
+          },
+          "method": {
+            "$ref": "#/components/schemas/payment-method"
+          }
+        },
+        "required": [
+          "walletAddress",
+          "receiver",
+          "method"
+        ],
+        "additionalProperties": false
+      },
+      "create-quote-request-with-receive-amount": {
+        "title": "With fixed-receive amount",
+        "description": "Create a quote with a fixed-receive amount",
+        "properties": {
+          "walletAddress": {
+            "$ref": "#/components/schemas/walletAddress"
+          },
+          "receiver": {
+            "$ref": "#/components/schemas/receiver"
+          },
+          "method": {
+            "$ref": "#/components/schemas/payment-method"
+          },
+          "receiveAmount": {
+            "description": "The fixed amount that would be paid into the receiving wallet address given a successful outgoing payment.",
+            "$ref": "#/components/schemas/amount"
+          }
+        },
+        "required": [
+          "walletAddress",
+          "receiver",
+          "method",
+          "receiveAmount"
+        ],
+        "additionalProperties": false
+      },
+      "create-quote-request-with-debit-amount": {
+        "title": "With fixed-send amount",
+        "description": "Create a quote with a fixed-send amount",
+        "properties": {
+          "walletAddress": {
+            "$ref": "#/components/schemas/walletAddress"
+          },
+          "receiver": {
+            "$ref": "#/components/schemas/receiver"
+          },
+          "method": {
+            "$ref": "#/components/schemas/payment-method"
+          },
+          "debitAmount": {
+            "description": "The fixed amount that would be sent from the sending wallet address given a successful outgoing payment.",
+            "$ref": "#/components/schemas/amount"
+          }
+        },
+        "required": [
+          "walletAddress",
+          "receiver",
+          "method",
+          "debitAmount"
+        ],
+        "additionalProperties": false
       },
       "amount": {
         "title": "amount",

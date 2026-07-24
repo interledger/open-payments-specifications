@@ -1,0 +1,148 @@
+name: Notify SDK repositories on major/minor version update
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify-sdks:
+    runs-on: ubuntu-latest
+    if: |
+      !github.event.release.draft &&
+      !github.event.release.prerelease
+    steps:
+      - name: Check version
+        id: check-version
+        run: |
+          tag_name="${{ github.event.release.tag_name }}"
+          read major minor patch <<< $(echo "$tag_name" | sed 's/^v//' | awk -F'[.v-]' '{print $1, $2, $3}')
+          
+          echo "Version: $tag_name (major: $major, minor: $minor, patch: $patch)"
+          
+          # Check if it's a minor or major update (patch version is 0)
+          if [ "$patch" == "0" ]; then
+            echo "at_least_minor_version_update=true" >> "$GITHUB_OUTPUT"
+            echo "version=${tag_name#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "at_least_minor_version_update=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create issues in SDK repositories
+        if: steps.check-version.outputs.at_least_minor_version_update == 'true'
+        uses: actions/github-script@v9
+        env:
+          VERSION: ${{ steps.check-version.outputs.version }}
+        with:
+          github-token: ${{ secrets.SDK_REPO_NOTIFIER_TOKEN }}
+          script: |
+            const repos = [
+              "open-payments-node",
+              "open-payments-rust",
+              "open-payments-php",
+              "open-payments-dotnet",
+              "open-payments-java",
+              "open-payments-go"
+            ];
+            
+            const version = process.env.VERSION;
+            const release = context.payload.release;
+            const headers = {
+              'X-GitHub-Api-Version': '2026-03-10'
+            };
+            
+            const body = `## Specification Update
+
+            A new version of the Open Payments specifications has been released: [${release.tag_name}](${release.html_url}).
+
+            ### Todo
+            - [ ] Review the changes in the latest specification
+            - [ ] Update the SDK to maintain feature compatibility
+            - [ ] Release a new version of the SDK
+            - [ ] If applicable, you will be assigned an issue to add or update snippets in the Open Payments docs by the technical writing team
+
+            <details>
+            <summary><b>View Release Notes</b></summary>
+
+            ${release.body}
+
+            </details>
+
+            ---
+            *This issue was automatically created by the SDK Repo Notifier workflow in [interledger/open-payments-specifications](https://github.com/interledger/open-payments-specifications).*`;
+
+            const createdIssueUrls = [];
+
+            for (const sdkRepo of repos) {
+              const issueTitle = `Update to Open Payments Specification v${version}`;
+              try {
+                // Check if issue already exists
+                const { data: { items: existingIssues } } = await github.rest.search.issuesAndPullRequests({
+                  q: `repo:interledger/${sdkRepo} is:issue "${issueTitle}" in:title`,
+                  headers
+                });
+
+                const existingIssue = existingIssues.find(i => i.title === issueTitle);
+                if (existingIssue) {
+                   console.log(`Issue already exists in interledger/${sdkRepo}: ${existingIssue.html_url}`);
+                   createdIssueUrls.push(existingIssue.html_url);
+                   continue;
+                }
+
+                console.log(`Creating issue in interledger/${sdkRepo}`);
+                const { data: issue } = await github.rest.issues.create({
+                  owner: 'interledger',
+                  repo: sdkRepo,
+                  title: issueTitle,
+                  body,
+                  headers
+                });
+                createdIssueUrls.push(issue.html_url);
+              } catch (error) {
+                core.error(`Failed to create issue in interledger/${sdkRepo}: ${error.message}`);
+              }
+            }
+
+            if (createdIssueUrls.length > 0) {
+              try {
+                const summaryTitle = `SDK updates for Open Payments Specification v${version}`;
+                const statusIssueBody = `## SDK Update Status
+
+                This issue tracks the SDK updates for the new version of the specifications: [${release.tag_name}](${release.html_url}).\n
+                
+                ### Issues
+
+                ${createdIssueUrls.map(issueUrl => `- [ ] ${issueUrl}`).join('\n')}
+
+                ---
+                *This issue was automatically created by the SDK Repo Notifier workflow.*`.replace(/^\s+/gm, '');
+                
+                // Check if summary issue already exists
+                const { data: { items: existingSummaries } } = await github.rest.search.issuesAndPullRequests({
+                  q: `repo:interledger/open-payments is:issue "${summaryTitle}" in:title`,
+                  headers
+                });
+
+                const existingSummary = existingSummaries.find(i => i.title === summaryTitle);
+                if (existingSummary) {
+                  console.log(`Updating existing summary issue in interledger/open-payments: ${existingSummary.html_url}`);
+                  await github.rest.issues.update({
+                    owner: 'interledger',
+                    repo: 'open-payments',
+                    issue_number: existingSummary.number,
+                    body: statusIssueBody,
+                    headers
+                  });
+                } else {
+                  console.log('Creating summary issue in interledger/open-payments');
+                  await github.rest.issues.create({
+                    owner: 'interledger',
+                    repo: 'open-payments',
+                    title: summaryTitle,
+                    body: statusIssueBody,
+                    headers
+                  });
+                }
+              } catch (error) {
+                core.error(`Failed to create summary issue in interledger/open-payments: ${error.message}`);
+              }
+            }

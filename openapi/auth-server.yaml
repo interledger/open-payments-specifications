@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments Authorization Server
-  version: '1.3.2'
+  version: '1.3.3'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -496,38 +496,8 @@ components:
   schemas:
     grant-request:
       anyOf:
-        - title: with Access Token
-          type: object
-          properties:
-            client:
-              $ref: '#/components/schemas/client'
-            interact:
-              $ref: '#/components/schemas/interact-request'
-            access_token:
-              type: object
-              required: [access]
-              properties:
-                access:
-                  $ref: '#/components/schemas/access'
-            subject:
-              $ref: '#/components/schemas/subject'
-          required: [client, access_token]
-        - title: with Subject
-          type: object
-          properties:
-            client:
-              $ref: '#/components/schemas/client'
-            interact:
-              $ref: '#/components/schemas/interact-request'
-            access_token:
-              type: object
-              required: [access]
-              properties:
-                access:
-                  $ref: '#/components/schemas/access'
-            subject:
-              $ref: '#/components/schemas/subject'
-          required: [client, interact, subject]
+        - $ref: '#/components/schemas/grant-request-with-access-token'
+        - $ref: '#/components/schemas/grant-request-with-subject'
     continuation-request:
       type: object
       properties:
@@ -709,27 +679,9 @@ components:
 
         If sending a grant initiation request that requires RO interaction, the wallet address MUST serve necessary client display information.
       oneOf:
-        - title: Wallet address object
-          type: object
-          required: [walletAddress]
-          properties:
-            walletAddress:
-              type: string
-              format: uri
-              description: Wallet address of the client instance that is making this request.
-          additionalProperties: false
-        - title: Directed identity (JWK)
-          type: object
-          required: [jwk]
-          properties:
-            jwk:
-              $ref: '#/components/schemas/json-web-key'
-          additionalProperties: false
-        - title: Wallet address string (deprecated)
-          type: string
-          format: uri
-          description: 'DEPRECATED: This string format of the client wallet address is maintained only for backwards compatibility. Migrate to the object form with `jwk` or `walletAddress`.'
-          deprecated: true
+        - $ref: '#/components/schemas/client-wallet-address'
+        - $ref: '#/components/schemas/client-directed-identity'
+        - $ref: '#/components/schemas/client-wallet-address-string'
     continue:
       title: continue
       type: object
@@ -815,37 +767,101 @@ components:
       title: limits-outgoing
       description: Open Payments specific property that defines the limits under which outgoing payments can be created.
       anyOf:
-        - title: No amount limit
+        - $ref: '#/components/schemas/limits-outgoing-no-amount'
+        - $ref: '#/components/schemas/limits-outgoing-debit-amount'
+        - $ref: '#/components/schemas/limits-outgoing-receive-amount'
+    grant-request-with-access-token:
+      title: with Access Token
+      type: object
+      properties:
+        client:
+          $ref: '#/components/schemas/client'
+        interact:
+          $ref: '#/components/schemas/interact-request'
+        access_token:
           type: object
+          required: [access]
           properties:
-            receiver:
-              $ref: '#/components/schemas/receiver'
-            interval:
-              $ref: '#/components/schemas/interval'
-        - title: Debit amount limit
+            access:
+              $ref: '#/components/schemas/access'
+        subject:
+          $ref: '#/components/schemas/subject'
+      required: [client, access_token]
+    grant-request-with-subject:
+      title: with Subject
+      type: object
+      properties:
+        client:
+          $ref: '#/components/schemas/client'
+        interact:
+          $ref: '#/components/schemas/interact-request'
+        access_token:
           type: object
+          required: [access]
           properties:
-            receiver:
-              $ref: '#/components/schemas/receiver'
-            interval:
-              $ref: '#/components/schemas/interval'
-            debitAmount:
-              description: 'All amounts are maxima, i.e. multiple payments can be created under a grant as long as the total amounts of these payments do not exceed the maximum amount per interval as specified in the grant.'
-              $ref: '#/components/schemas/amount'
-          required:
-            - debitAmount
-        - title: Receive amount limit
-          type: object
-          properties:
-            receiver:
-              $ref: '#/components/schemas/receiver'
-            interval:
-              $ref: '#/components/schemas/interval'
-            receiveAmount:
-              description: 'All amounts are maxima, i.e. multiple payments can be created under a grant as long as the total amounts of these payments do not exceed the maximum amount per interval as specified in the grant.'
-              $ref: '#/components/schemas/amount'
-          required:
-            - receiveAmount
+            access:
+              $ref: '#/components/schemas/access'
+        subject:
+          $ref: '#/components/schemas/subject'
+      required: [client, interact, subject]
+    client-wallet-address:
+      title: Wallet address object
+      type: object
+      required: [walletAddress]
+      properties:
+        walletAddress:
+          type: string
+          format: uri
+          description: Wallet address of the client instance that is making this request.
+      additionalProperties: false
+    client-directed-identity:
+      title: Directed identity (JWK)
+      type: object
+      required: [jwk]
+      properties:
+        jwk:
+          $ref: '#/components/schemas/json-web-key'
+      additionalProperties: false
+    client-wallet-address-string:
+      title: Wallet address string (deprecated)
+      type: string
+      format: uri
+      description: 'DEPRECATED: This string format of the client wallet address is maintained only for backwards compatibility. Migrate to the object form with `jwk` or `walletAddress`.'
+      deprecated: true
+    limits-outgoing-no-amount:
+      title: No amount limit
+      type: object
+      properties:
+        receiver:
+          $ref: '#/components/schemas/receiver'
+        interval:
+          $ref: '#/components/schemas/interval'
+    limits-outgoing-debit-amount:
+      title: Debit amount limit
+      type: object
+      properties:
+        receiver:
+          $ref: '#/components/schemas/receiver'
+        interval:
+          $ref: '#/components/schemas/interval'
+        debitAmount:
+          description: 'All amounts are maxima, i.e. multiple payments can be created under a grant as long as the total amounts of these payments do not exceed the maximum amount per interval as specified in the grant.'
+          $ref: '#/components/schemas/amount'
+      required:
+        - debitAmount
+    limits-outgoing-receive-amount:
+      title: Receive amount limit
+      type: object
+      properties:
+        receiver:
+          $ref: '#/components/schemas/receiver'
+        interval:
+          $ref: '#/components/schemas/interval'
+        receiveAmount:
+          description: 'All amounts are maxima, i.e. multiple payments can be created under a grant as long as the total amounts of these payments do not exceed the maximum amount per interval as specified in the grant.'
+          $ref: '#/components/schemas/amount'
+      required:
+        - receiveAmount
     pin-working-key:
       title: pin-working-key
       type: object
