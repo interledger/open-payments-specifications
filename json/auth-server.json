@@ -1313,7 +1313,7 @@
       "card-authorization": {
         "title": "card-authorization",
         "type": "object",
-        "description": "Card (EMV) authorization data on an outgoing-payment access, carried in both the grant request and the grant response.",
+        "description": "Card (EMV) authorization data on an outgoing-payment access when `interact.start` includes `card` — the credentials in a grant request, the result in a grant response.",
         "properties": {
           "tlvData": {
             "type": "string",
