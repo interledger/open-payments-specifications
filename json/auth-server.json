@@ -77,7 +77,7 @@
                     },
                     {
                       "title": "Approved without continuation",
-                      "description": "The grant is approved in-line and the access token returned directly, with the card result in `cardAuthorization` and no `continue` field. Used by the `card` interaction method.",
+                      "description": "The grant is approved in-line and the access token returned directly, with no `continue` field. Used by the `card` interaction method.",
                       "properties": {
                         "access_token": {
                           "$ref": "#/components/schemas/access_token"
@@ -85,19 +85,6 @@
                       },
                       "required": [
                         "access_token"
-                      ],
-                      "additionalProperties": false
-                    },
-                    {
-                      "title": "Completed without a grant",
-                      "description": "The `card` interaction completed but the authorization was declined. The card result is returned in `cardAuthorization` and no access token is granted.",
-                      "properties": {
-                        "cardAuthorization": {
-                          "$ref": "#/components/schemas/card-authorization-response"
-                        }
-                      },
-                      "required": [
-                        "cardAuthorization"
                       ],
                       "additionalProperties": false
                     }
@@ -166,21 +153,13 @@
                                 "assetCode": "USD",
                                 "assetScale": 2
                               }
+                            },
+                            "cardAuthorization": {
+                              "tlvData": "8A023030...",
+                              "requestId": "018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b"
                             }
                           }
-                        ],
-                        "cardAuthorization": {
-                          "tlvData": "8A023030...",
-                          "requestId": "018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b"
-                        }
-                      }
-                    }
-                  },
-                  "Card authorization declined (no grant)": {
-                    "value": {
-                      "cardAuthorization": {
-                        "tlvData": "8A023531...",
-                        "requestId": "019a1f7c-2d4e-7a8b-b3c1-5e7f9a0c2d4e"
+                        ]
                       }
                     }
                   }
@@ -953,7 +932,7 @@
             "$ref": "#/components/schemas/limits-outgoing"
           },
           "cardAuthorization": {
-            "$ref": "#/components/schemas/card-authorization-request"
+            "$ref": "#/components/schemas/card-authorization"
           }
         },
         "required": [
@@ -1012,9 +991,6 @@
           },
           "access": {
             "$ref": "#/components/schemas/access"
-          },
-          "cardAuthorization": {
-            "$ref": "#/components/schemas/card-authorization-response"
           }
         },
         "required": [
@@ -1334,14 +1310,14 @@
         ],
         "additionalProperties": false
       },
-      "card-authorization-request": {
-        "title": "card-authorization-request",
+      "card-authorization": {
+        "title": "card-authorization",
         "type": "object",
-        "description": "Card (EMV) credentials, present on the outgoing-payment access when `interact.start` includes `card`.",
+        "description": "Card (EMV) authorization data on an outgoing-payment access, carried in both the grant request and the grant response.",
         "properties": {
           "tlvData": {
             "type": "string",
-            "description": "Card data as EMV TLV."
+            "description": "Card data on a request, the authorization result on a response, as EMV TLV."
           },
           "pinBlock": {
             "type": "string",
@@ -1364,26 +1340,6 @@
             "pwk"
           ]
         },
-        "additionalProperties": false
-      },
-      "card-authorization-response": {
-        "title": "card-authorization-response",
-        "type": "object",
-        "description": "The result of a card (EMV) authorization, returned in-line on the access token.",
-        "properties": {
-          "tlvData": {
-            "type": "string",
-            "description": "The EMV authorization result as TLV (ARC, authorisation code, and ARPC)."
-          },
-          "requestId": {
-            "type": "string",
-            "description": "Echoes the `requestId` from the authorization request."
-          }
-        },
-        "required": [
-          "tlvData",
-          "requestId"
-        ],
         "additionalProperties": false
       },
       "error-invalid-client": {
