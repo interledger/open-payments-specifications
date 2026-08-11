@@ -1317,7 +1317,7 @@
           },
           "requestId": {
             "type": "string",
-            "description": "Client-generated identifier for the request; replaying it MUST return the same result rather than authorizing again."
+            "description": "Client-generated identifier for the request; replaying it MUST return the same value as the one given in the original grant request."
           }
         },
         "required": [
