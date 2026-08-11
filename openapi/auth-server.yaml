@@ -55,7 +55,7 @@ paths:
                       - access_token
                       - continue
                   - title: Approved without continuation
-                    description: The grant is approved in-line and the access token returned directly, with no `continue` field. Used by the `card` interaction method.
+                    description: The grant is approved and the access token returned directly, with no `continue` field — as for a non-interactive card authorization.
                     properties:
                       access_token:
                         $ref: '#/components/schemas/access_token'
@@ -185,9 +185,6 @@ paths:
                             iv: '00000000000000000000000000000000'
                           requestId: 018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b
                   client: 'https://webmonize.com/.well-known/pay'
-                  interact:
-                    start:
-                      - card
               Grant request for a no-CVM card payment (no PIN):
                 value:
                   access_token:
@@ -207,9 +204,6 @@ paths:
                           tlvData: '9F26089F27019F1002...'
                           requestId: 018f8d31-9a2b-7c4d-8e1f-3b5d7f9a1c2e
                   client: 'https://webmonize.com/.well-known/pay'
-                  interact:
-                    start:
-                      - card
               Grant request for creating and reading incoming payments:
                 value:
                   access_token:
@@ -702,7 +696,6 @@ components:
             type: string
             enum:
               - redirect
-              - card
         finish:
           type: object
           description: Indicates how the client instance can receive an indication that interaction has finished at the AS.
@@ -869,7 +862,7 @@ components:
     card-authorization:
       title: card-authorization
       type: object
-      description: Card (EMV) authorization data on an outgoing-payment access when `interact.start` includes `card` — the credentials in a grant request, the result in a grant response.
+      description: Card (EMV) authorization data on an outgoing-payment access; its presence marks a card authorization — the credentials in a grant request, the result in a grant response.
       properties:
         tlvData:
           type: string

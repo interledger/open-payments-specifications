@@ -77,7 +77,7 @@
                     },
                     {
                       "title": "Approved without continuation",
-                      "description": "The grant is approved in-line and the access token returned directly, with no `continue` field. Used by the `card` interaction method.",
+                      "description": "The grant is approved and the access token returned directly, with no `continue` field — as for a non-interactive card authorization.",
                       "properties": {
                         "access_token": {
                           "$ref": "#/components/schemas/access_token"
@@ -280,12 +280,7 @@
                         }
                       ]
                     },
-                    "client": "https://webmonize.com/.well-known/pay",
-                    "interact": {
-                      "start": [
-                        "card"
-                      ]
-                    }
+                    "client": "https://webmonize.com/.well-known/pay"
                   }
                 },
                 "Grant request for a no-CVM card payment (no PIN)": {
@@ -314,12 +309,7 @@
                         }
                       ]
                     },
-                    "client": "https://webmonize.com/.well-known/pay",
-                    "interact": {
-                      "start": [
-                        "card"
-                      ]
-                    }
+                    "client": "https://webmonize.com/.well-known/pay"
                   }
                 },
                 "Grant request for creating and reading incoming payments": {
@@ -1057,8 +1047,7 @@
             "items": {
               "type": "string",
               "enum": [
-                "redirect",
-                "card"
+                "redirect"
               ]
             }
           },
@@ -1313,7 +1302,7 @@
       "card-authorization": {
         "title": "card-authorization",
         "type": "object",
-        "description": "Card (EMV) authorization data on an outgoing-payment access when `interact.start` includes `card` — the credentials in a grant request, the result in a grant response.",
+        "description": "Card (EMV) authorization data on an outgoing-payment access; its presence marks a card authorization — the credentials in a grant request, the result in a grant response.",
         "properties": {
           "tlvData": {
             "type": "string",
