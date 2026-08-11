@@ -526,17 +526,31 @@ components:
         - 'https://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
         - 'http://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
         - 'https://ilp.interledger-test.dev/incoming-payments/1'
-    access:
+    access-request:
       type: array
       description: A description of the rights associated with this access token.
       items:
-        $ref: '#/components/schemas/access-item'
+        $ref: '#/components/schemas/access-item-request'
       uniqueItems: true
       maxItems: 3
-    access-item:
+    access-response:
+      type: array
+      description: A description of the rights associated with this access token.
+      items:
+        $ref: '#/components/schemas/access-item-response'
+      uniqueItems: true
+      maxItems: 3
+    access-item-request:
       oneOf:
         - $ref: '#/components/schemas/access-incoming'
-        - $ref: '#/components/schemas/access-outgoing'
+        - $ref: '#/components/schemas/access-outgoing-request'
+        - $ref: '#/components/schemas/access-quote'
+      description: The access associated with the access token is described using objects that each contain multiple dimensions of access.
+      unevaluatedProperties: false
+    access-item-response:
+      oneOf:
+        - $ref: '#/components/schemas/access-incoming'
+        - $ref: '#/components/schemas/access-outgoing-response'
         - $ref: '#/components/schemas/access-quote'
       description: The access associated with the access token is described using objects that each contain multiple dimensions of access.
       unevaluatedProperties: false
@@ -569,8 +583,8 @@ components:
       required:
         - type
         - actions
-    access-outgoing:
-      title: access-outgoing
+    access-outgoing-base:
+      title: access-outgoing-base
       type: object
       properties:
         type:
@@ -596,12 +610,26 @@ components:
           description: A string identifier indicating a specific resource at the RS.
         limits:
           $ref: '#/components/schemas/limits-outgoing'
-        cardAuthorization:
-          $ref: '#/components/schemas/card-authorization'
       required:
         - type
         - actions
         - identifier
+    access-outgoing-request:
+      title: access-outgoing-request
+      allOf:
+        - $ref: '#/components/schemas/access-outgoing-base'
+        - type: object
+          properties:
+            cardAuthorization:
+              $ref: '#/components/schemas/card-authorization-request'
+    access-outgoing-response:
+      title: access-outgoing-response
+      allOf:
+        - $ref: '#/components/schemas/access-outgoing-base'
+        - type: object
+          properties:
+            cardAuthorization:
+              $ref: '#/components/schemas/card-authorization-response'
     access-quote:
       title: access-quote
       type: object
@@ -640,7 +668,7 @@ components:
           type: integer
           description: The number of seconds in which the access will expire.  The client instance MUST NOT use the access token past this time.  An RS MUST NOT accept an access token past this time.
         access:
-          $ref: '#/components/schemas/access'
+          $ref: '#/components/schemas/access-response'
       required:
         - value
         - manage
@@ -768,7 +796,7 @@ components:
           required: [access]
           properties:
             access:
-              $ref: '#/components/schemas/access'
+              $ref: '#/components/schemas/access-request'
         subject:
           $ref: '#/components/schemas/subject'
       required: [client, access_token]
@@ -785,7 +813,7 @@ components:
           required: [access]
           properties:
             access:
-              $ref: '#/components/schemas/access'
+              $ref: '#/components/schemas/access-request'
         subject:
           $ref: '#/components/schemas/subject'
       required: [client, interact, subject]
@@ -866,29 +894,42 @@ components:
         - kvc
         - iv
       additionalProperties: false
-    card-authorization:
-      title: card-authorization
+    card-authorization-base:
+      title: card-authorization-base
       type: object
-      description: Card (EMV) authorization data on an outgoing-payment access when `interact.start` includes `card` — the credentials in a grant request, the result in a grant response.
+      description: Fields shared by card (EMV) authorization data on both the grant request and response.
       properties:
         tlvData:
           type: string
           description: Card data on a request, the authorization result on a response, as EMV TLV.
-        pinBlock:
-          type: string
-          description: The PIN block, encrypted under the PIN Working Key (PWK). Omitted when no PIN was captured.
-        pwk:
-          $ref: '#/components/schemas/pin-working-key'
         requestId:
           type: string
           description: Client-generated identifier for the request; replaying it MUST return the same value as the one given in the original grant request.
       required:
         - tlvData
         - requestId
-      dependentRequired:
-        pinBlock:
-          - pwk
-      additionalProperties: false
+    card-authorization-request:
+      title: card-authorization-request
+      description: Card (EMV) authorization credentials submitted on a grant request when `interact.start` includes `card`.
+      allOf:
+        - $ref: '#/components/schemas/card-authorization-base'
+        - type: object
+          properties:
+            pinBlock:
+              type: string
+              description: The PIN block, encrypted under the PIN Working Key (PWK). Omitted when no PIN was captured.
+            pwk:
+              $ref: '#/components/schemas/pin-working-key'
+          dependentRequired:
+            pinBlock:
+              - pwk
+      unevaluatedProperties: false
+    card-authorization-response:
+      title: card-authorization-response
+      description: Card (EMV) authorization result returned on a grant response when the grant was created via a card interaction.
+      allOf:
+        - $ref: '#/components/schemas/card-authorization-base'
+      unevaluatedProperties: false
     error-invalid-client:
       title: Invalid client
       type: object
