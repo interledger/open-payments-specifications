@@ -157,6 +157,47 @@ paths:
                       method: redirect
                       uri: 'https://webmonize.com/return/876FGRD8VC'
                       nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
+              Grant request for creating and reading incoming payments:
+                value:
+                  access_token:
+                    access:
+                      - type: incoming-payment
+                        actions:
+                          - create
+                          - read
+                        identifier: 'http://ilp.interledger-test.dev/bob'
+                  client: 'https://webmonize.com/.well-known/pay'
+              Grant request with directed identity (JWK):
+                value:
+                  access_token:
+                    access:
+                      - type: incoming-payment
+                        actions:
+                          - create
+                          - read
+                        identifier: 'http://ilp.interledger-test.dev/bob'
+                  client:
+                    jwk:
+                      kid: example-key-1
+                      alg: EdDSA
+                      use: sig
+                      kty: OKP
+                      crv: Ed25519
+                      x: 11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo
+              Grant request for subject information:
+                value:
+                  subject:
+                    sub_ids:
+                      - id: 'https://ilp.interledger-test.dev/alice'
+                        format: 'uri'
+                  client: 'https://webmonize.com/.well-known/pay'
+                  interact:
+                    start:
+                      - redirect
+                    finish:
+                      method: redirect
+                      uri: 'https://webmonize.com/return/876FGRD8VC'
+                      nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
               Grant request for authorizing a card payment:
                 value:
                   access_token:
@@ -200,47 +241,6 @@ paths:
                           tlvData: '9F26089F27019F1002...'
                           requestId: 018f8d31-9a2b-7c4d-8e1f-3b5d7f9a1c2e
                   client: 'https://webmonize.com/.well-known/pay'
-              Grant request for creating and reading incoming payments:
-                value:
-                  access_token:
-                    access:
-                      - type: incoming-payment
-                        actions:
-                          - create
-                          - read
-                        identifier: 'http://ilp.interledger-test.dev/bob'
-                  client: 'https://webmonize.com/.well-known/pay'
-              Grant request with directed identity (JWK):
-                value:
-                  access_token:
-                    access:
-                      - type: incoming-payment
-                        actions:
-                          - create
-                          - read
-                        identifier: 'http://ilp.interledger-test.dev/bob'
-                  client:
-                    jwk:
-                      kid: example-key-1
-                      alg: EdDSA
-                      use: sig
-                      kty: OKP
-                      crv: Ed25519
-                      x: 11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo
-              Grant request for subject information:
-                value:
-                  subject:
-                    sub_ids:
-                      - id: 'https://ilp.interledger-test.dev/alice'
-                        format: 'uri'
-                  client: 'https://webmonize.com/.well-known/pay'
-                  interact:
-                    start:
-                      - redirect
-                    finish:
-                      method: redirect
-                      uri: 'https://webmonize.com/return/876FGRD8VC'
-                      nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
         description: ''
         required: true
       description: Make a new grant request

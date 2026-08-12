@@ -241,70 +241,6 @@
                     }
                   }
                 },
-                "Grant request for authorizing a card payment": {
-                  "value": {
-                    "access_token": {
-                      "access": [
-                        {
-                          "type": "outgoing-payment",
-                          "actions": [
-                            "create",
-                            "read"
-                          ],
-                          "identifier": "https://ilp.interledger-test.dev/alice",
-                          "limits": {
-                            "receiver": "https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7",
-                            "receiveAmount": {
-                              "value": "1000",
-                              "assetCode": "USD",
-                              "assetScale": 2
-                            }
-                          },
-                          "cardAuthorization": {
-                            "tlvData": "9F26089F27019F1002...",
-                            "pinBlock": "23e412341234",
-                            "pwk": {
-                              "key": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
-                              "kvc": "A3F1C2",
-                              "iv": "00000000000000000000000000000000"
-                            },
-                            "requestId": "018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b"
-                          }
-                        }
-                      ]
-                    },
-                    "client": "https://webmonize.com/.well-known/pay"
-                  }
-                },
-                "Grant request for a no-CVM card payment (no PIN)": {
-                  "value": {
-                    "access_token": {
-                      "access": [
-                        {
-                          "type": "outgoing-payment",
-                          "actions": [
-                            "create",
-                            "read"
-                          ],
-                          "identifier": "https://ilp.interledger-test.dev/alice",
-                          "limits": {
-                            "receiver": "https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7",
-                            "receiveAmount": {
-                              "value": "250",
-                              "assetCode": "USD",
-                              "assetScale": 2
-                            }
-                          },
-                          "cardAuthorization": {
-                            "tlvData": "9F26089F27019F1002...",
-                            "requestId": "018f8d31-9a2b-7c4d-8e1f-3b5d7f9a1c2e"
-                          }
-                        }
-                      ]
-                    },
-                    "client": "https://webmonize.com/.well-known/pay"
-                  }
-                },
                 "Grant request for creating and reading incoming payments": {
                   "value": {
                     "access_token": {
@@ -369,6 +305,70 @@
                         "nonce": "4edb2194-dbdf-46bb-9397-d5fd57b7c8a7"
                       }
                     }
+                  }
+                },
+                "Grant request for authorizing a card payment": {
+                  "value": {
+                    "access_token": {
+                      "access": [
+                        {
+                          "type": "outgoing-payment",
+                          "actions": [
+                            "create",
+                            "read"
+                          ],
+                          "identifier": "https://ilp.interledger-test.dev/alice",
+                          "limits": {
+                            "receiver": "https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7",
+                            "receiveAmount": {
+                              "value": "1000",
+                              "assetCode": "USD",
+                              "assetScale": 2
+                            }
+                          },
+                          "cardAuthorization": {
+                            "tlvData": "9F26089F27019F1002...",
+                            "pinBlock": "23e412341234",
+                            "pwk": {
+                              "key": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+                              "kvc": "A3F1C2",
+                              "iv": "00000000000000000000000000000000"
+                            },
+                            "requestId": "018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b"
+                          }
+                        }
+                      ]
+                    },
+                    "client": "https://webmonize.com/.well-known/pay"
+                  }
+                },
+                "Grant request for a no-CVM card payment (no PIN)": {
+                  "value": {
+                    "access_token": {
+                      "access": [
+                        {
+                          "type": "outgoing-payment",
+                          "actions": [
+                            "create",
+                            "read"
+                          ],
+                          "identifier": "https://ilp.interledger-test.dev/alice",
+                          "limits": {
+                            "receiver": "https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7",
+                            "receiveAmount": {
+                              "value": "250",
+                              "assetCode": "USD",
+                              "assetScale": 2
+                            }
+                          },
+                          "cardAuthorization": {
+                            "tlvData": "9F26089F27019F1002...",
+                            "requestId": "018f8d31-9a2b-7c4d-8e1f-3b5d7f9a1c2e"
+                          }
+                        }
+                      ]
+                    },
+                    "client": "https://webmonize.com/.well-known/pay"
                   }
                 }
               }
