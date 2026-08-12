@@ -74,19 +74,6 @@
                         "access_token",
                         "continue"
                       ]
-                    },
-                    {
-                      "title": "Approved without continuation",
-                      "description": "The grant is approved and the access token returned directly, with no `continue` field — as for a non-interactive card authorization.",
-                      "properties": {
-                        "access_token": {
-                          "$ref": "#/components/schemas/access_token"
-                        }
-                      },
-                      "required": [
-                        "access_token"
-                      ],
-                      "additionalProperties": false
                     }
                   ],
                   "type": "object"
@@ -132,7 +119,7 @@
                       }
                     }
                   },
-                  "Grant (card authorization, returned without continuation)": {
+                  "Grant (card authorization response)": {
                     "value": {
                       "access_token": {
                         "value": "OS9M2PMHKUR64TB8N6BW7OZB8CDFONP219RP1LT0",
@@ -160,6 +147,12 @@
                             }
                           }
                         ]
+                      },
+                      "continue": {
+                        "access_token": {
+                          "value": "33OMUKMKSKU80UPRY5NM"
+                        },
+                        "uri": "https://auth.interledger-test.dev/continue/4CF492MLVMSW9MKMXKHQ"
                       }
                     }
                   }
