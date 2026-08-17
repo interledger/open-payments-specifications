@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments Authorization Server
-  version: '1.3.3'
+  version: '1.4.0'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -78,6 +78,31 @@ paths:
                             - create
                             - read
                           identifier: 'https://ilp.interledger-test.dev/bob'
+                    continue:
+                      access_token:
+                        value: 33OMUKMKSKU80UPRY5NM
+                      uri: 'https://auth.interledger-test.dev/continue/4CF492MLVMSW9MKMXKHQ'
+                Grant (card authorization response):
+                  value:
+                    access_token:
+                      value: OS9M2PMHKUR64TB8N6BW7OZB8CDFONP219RP1LT0
+                      manage: 'https://auth.interledger-test.dev/token/dd17a202-9982-4ed9-ae31-564947fb6379'
+                      expires_in: 3600
+                      access:
+                        - type: outgoing-payment
+                          actions:
+                            - create
+                            - read
+                          identifier: 'https://ilp.interledger-test.dev/alice'
+                          limits:
+                            receiver: 'https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7'
+                            receiveAmount:
+                              value: '1000'
+                              assetCode: USD
+                              assetScale: 2
+                          cardAuthorization:
+                            tlvData: '8A023030...'
+                            requestId: 018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b
                     continue:
                       access_token:
                         value: 33OMUKMKSKU80UPRY5NM
@@ -173,6 +198,49 @@ paths:
                       method: redirect
                       uri: 'https://webmonize.com/return/876FGRD8VC'
                       nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
+              Grant request for authorizing a card payment:
+                value:
+                  access_token:
+                    access:
+                      - type: outgoing-payment
+                        actions:
+                          - create
+                          - read
+                        identifier: 'https://ilp.interledger-test.dev/alice'
+                        limits:
+                          receiver: 'https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7'
+                          receiveAmount:
+                            value: '1000'
+                            assetCode: USD
+                            assetScale: 2
+                        cardAuthorization:
+                          tlvData: '9F26089F27019F1002...'
+                          pinBlock: '23e412341234'
+                          pwk:
+                            key: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+                            kvc: A3F1C2
+                            iv: '00000000000000000000000000000000'
+                          requestId: 018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b
+                  client: 'https://webmonize.com/.well-known/pay'
+              Grant request for a no-CVM card payment (no PIN):
+                value:
+                  access_token:
+                    access:
+                      - type: outgoing-payment
+                        actions:
+                          - create
+                          - read
+                        identifier: 'https://ilp.interledger-test.dev/alice'
+                        limits:
+                          receiver: 'https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7'
+                          receiveAmount:
+                            value: '250'
+                            assetCode: USD
+                            assetScale: 2
+                        cardAuthorization:
+                          tlvData: '9F26089F27019F1002...'
+                          requestId: 018f8d31-9a2b-7c4d-8e1f-3b5d7f9a1c2e
+                  client: 'https://webmonize.com/.well-known/pay'
         description: ''
         required: true
       description: Make a new grant request
@@ -518,6 +586,8 @@ components:
           description: A string identifier indicating a specific resource at the RS.
         limits:
           $ref: '#/components/schemas/limits-outgoing'
+        cardAuthorization:
+          $ref: '#/components/schemas/card-authorization'
       required:
         - type
         - actions
@@ -766,6 +836,48 @@ components:
           $ref: '#/components/schemas/amount'
       required:
         - receiveAmount
+    pin-working-key:
+      title: pin-working-key
+      type: object
+      description: The PIN Working Key (PWK) used to encrypt the PIN block.
+      properties:
+        key:
+          type: string
+          description: The encrypted key material.
+        kvc:
+          type: string
+          description: Key Check Value of the key.
+        iv:
+          type: string
+          description: Initialization vector.
+      required:
+        - key
+        - kvc
+        - iv
+      additionalProperties: false
+    card-authorization:
+      title: card-authorization
+      type: object
+      description: Card (EMV) authorization data on an outgoing-payment access; its presence marks a card authorization — the credentials in a grant request, the result in a grant response.
+      properties:
+        tlvData:
+          type: string
+          description: Card data on a request, the authorization result on a response, as EMV TLV.
+        pinBlock:
+          type: string
+          description: The PIN block, encrypted under the PIN Working Key (PWK). Omitted when no PIN was captured.
+        pwk:
+          $ref: '#/components/schemas/pin-working-key'
+        requestId:
+          type: string
+          description: Client-generated identifier for the request; replaying it MUST return the same value as the one given in the original grant request.
+      required:
+        - tlvData
+        - requestId
+      dependentRequired:
+        pinBlock:
+          - pwk
+      additionalProperties: false
     error-invalid-client:
       title: Invalid client
       type: object
