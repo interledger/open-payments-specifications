@@ -1407,8 +1407,8 @@
         ]
       },
       "public-incoming-payment-with-auth-server": {
-        "title": "Incoming Payment without a Grant",
-        "description": "An **incoming payment** resource with public details, payment methods, and the authorization server for this wallet address.",
+        "title": "Incoming payment without a grant",
+        "description": "An **incoming payment** resource with public details.",
         "examples": [
           {
             "id": "https://ilp.interledger-test.dev/incoming-payments/016da9d5-c9a4-4c80-a354-86b915a04ff8",
@@ -1522,8 +1522,8 @@
         ]
       },
       "incoming-payment-with-methods": {
-        "title": "Incoming Payment with a Grant",
-        "description": "An **incoming payment** resource with public details.",
+        "title": "Incoming payment with a grant",
+        "description": "An **incoming payment** resource with public and private details.",
         "examples": [
           {
             "id": "https://ilp.interledger-test.dev/incoming-payments/2f1b0150-db73-49e8-8713-628baa4a17ff",
