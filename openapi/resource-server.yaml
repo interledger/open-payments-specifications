@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments
-  version: '1.4.0'
+  version: '1.4.1'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -508,9 +508,10 @@ paths:
               schema:
                 anyOf:
                   - $ref: '#/components/schemas/incoming-payment-with-methods'
-                  - $ref: '#/components/schemas/public-incoming-payment'
+                  - $ref: '#/components/schemas/public-incoming-payment-with-auth-server'
               examples:
-                Incoming Payment for $25 with $12.34 received so far:
+                Incoming payment with a grant:
+                  summary: Incoming payment with a grant
                   value:
                     id: 'https://ilp.interledger-test.dev/incoming-payments/2f1b0150-db73-49e8-8713-628baa4a17ff'
                     walletAddress: 'https://ilp.interledger-test.dev/alice/'
@@ -532,6 +533,26 @@ paths:
                       - type: ilp
                         ilpAddress: g.ilp.iwuyge987y.98y08y
                         sharedSecret: 1c7eaXa4rd2fFOBl1iydvCT1tV5TbM3RW1WLCafu_JA
+                Incoming payment without a grant:
+                  summary: Incoming payment without a grant
+                  value:
+                    id: 'https://ilp.interledger-test.dev/incoming-payments/016da9d5-c9a4-4c80-a354-86b915a04ff8'
+                    incomingAmount:
+                      value: '250'
+                      assetCode: USD
+                      assetScale: 2
+                    receivedAmount:
+                      value: '250'
+                      assetCode: USD
+                      assetScale: 2
+                    completed: true
+                    expiresAt: '2022-04-12T23:20:50.52Z'
+                    createdAt: '2022-03-12T23:20:50.52Z'
+                    authServer: 'https://auth.ilp.interledger-test.dev'
+                    methods:
+                      - type: ilp
+                        ilpAddress: g.ilp.iwuyge987y.98y08y
+                        sharedSecret: 1c7eaXa4rd2fFOBl1iydvCT1tV5TbM3RW1WLCafu_JA
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -542,7 +563,10 @@ paths:
       parameters:
         - $ref: '#/components/parameters/optional-signature-input'
         - $ref: '#/components/parameters/optional-signature'
-      description: A client can fetch the latest state of an incoming payment to determine the amount received into the wallet address.
+      description: |-
+        A client can fetch the latest state of an incoming payment to determine the amount received into the wallet address.
+
+        Without a grant, the response returns `id`, `completed`, `incomingAmount`, `receivedAmount`, `expiresAt`, `createdAt`, `methods`, and `authServer`. It does not return `walletAddress` or `metadata`.
     parameters:
       - $ref: '#/components/parameters/id'
   '/incoming-payments/{id}/complete':
@@ -898,10 +922,90 @@ components:
         - 'https://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
         - 'http://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
         - 'https://ilp.interledger-test.dev/incoming-payments/1'
+    public-incoming-payment:
+      title: Public Incoming Payment
+      description: An **incoming payment** resource with public details.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uri
+          description: The URL identifying the incoming payment.
+          readOnly: true
+        completed:
+          type: boolean
+          description: Describes whether the incoming payment has completed receiving fund.
+          default: false
+        incomingAmount:
+          $ref: '#/components/schemas/amount'
+          description: The maximum amount that should be paid into the wallet address under this incoming payment.
+        receivedAmount:
+          $ref: '#/components/schemas/amount'
+          description: The total amount that has been paid into the wallet address under this incoming payment.
+        expiresAt:
+          type: string
+          description: The date and time when payments under this incoming payment will no longer be accepted.
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the incoming payment was created.
+      required:
+        - id
+        - completed
+        - receivedAmount
+        - createdAt
+    public-incoming-payment-with-methods:
+      title: Public Incoming Payment with payment methods
+      description: An **incoming payment** resource with public details and payment methods.
+      allOf:
+        - $ref: '#/components/schemas/public-incoming-payment'
+        - type: object
+          properties:
+            methods:
+              description: The list of payment methods supported by this incoming payment.
+              type: array
+              uniqueItems: true
+              minItems: 0
+              items:
+                anyOf:
+                  - $ref: '#/components/schemas/ilp-payment-method'
+          required:
+            - methods
+    public-incoming-payment-with-auth-server:
+      title: Incoming payment without a grant
+      description: An **incoming payment** resource with public details and the authorization server for this wallet address.
+      examples:
+        - id: 'https://ilp.interledger-test.dev/incoming-payments/016da9d5-c9a4-4c80-a354-86b915a04ff8'
+          incomingAmount:
+            value: '250'
+            assetCode: USD
+            assetScale: 2
+          receivedAmount:
+            value: '250'
+            assetCode: USD
+            assetScale: 2
+          completed: true
+          expiresAt: '2022-04-12T23:20:50.52Z'
+          createdAt: '2022-03-12T23:20:50.52Z'
+          authServer: 'https://auth.ilp.interledger-test.dev'
+          methods:
+            - type: ilp
+              ilpAddress: g.ilp.iwuyge987y.98y08y
+              sharedSecret: 1c7eaXa4rd2fFOBl1iydvCT1tV5TbM3RW1WLCafu_JA
+      allOf:
+        - $ref: '#/components/schemas/public-incoming-payment-with-methods'
+        - type: object
+          properties:
+            authServer:
+              type: string
+              format: uri
+              description: The URL of the authorization server endpoint for getting grants and access tokens for this wallet address.
+          required:
+            - authServer
     incoming-payment:
       title: Incoming Payment
       description: 'An **incoming payment** resource represents a payment that will be, is currently being, or has been received by the account.'
-      type: object
       examples:
         - id: 'https://ilp.interledger-test.dev/incoming-payments/016da9d5-c9a4-4c80-a354-86b915a04ff8'
           walletAddress: 'https://ilp.interledger-test.dev/alice/'
@@ -931,81 +1035,48 @@ components:
             assetScale: 2
           expiresAt: '2022-04-12T23:20:50.52Z'
           createdAt: '2022-03-12T23:20:50.52Z'
-      properties:
-        id:
-          type: string
-          format: uri
-          description: The URL identifying the incoming payment.
-          readOnly: true
-        walletAddress:
-          type: string
-          format: uri
-          description: The URL of the wallet address this payment is being made into.
-          readOnly: true
-        completed:
-          type: boolean
-          description: Describes whether the incoming payment has completed receiving fund.
-          default: false
-        incomingAmount:
-          $ref: '#/components/schemas/amount'
-          description: The maximum amount that should be paid into the wallet address under this incoming payment.
-        receivedAmount:
-          $ref: '#/components/schemas/amount'
-          description: The total amount that has been paid into the wallet address under this incoming payment.
-        expiresAt:
-          type: string
-          description: The date and time when payments under this incoming payment will no longer be accepted.
-          format: date-time
-        metadata:
-          type: object
-          additionalProperties: true
-          description: Additional metadata associated with the incoming payment. (Optional)
-        createdAt:
-          type: string
-          format: date-time
-          description: The date and time when the incoming payment was created.
-      required:
-        - id
-        - walletAddress
-        - completed
-        - receivedAmount
-        - createdAt
-    incoming-payment-with-methods:
-      title: Incoming Payment with payment methods
-      description: An **incoming payment** resource with public details.
       allOf:
-        - $ref: '#/components/schemas/incoming-payment'
+        - $ref: '#/components/schemas/public-incoming-payment'
         - type: object
           properties:
-            methods:
-              description: The list of payment methods supported by this incoming payment.
-              type: array
-              uniqueItems: true
-              minItems: 0
-              items:
-                anyOf:
-                  - $ref: '#/components/schemas/ilp-payment-method'
+            walletAddress:
+              type: string
+              format: uri
+              description: The URL of the wallet address this payment is being made into.
+              readOnly: true
+            metadata:
+              type: object
+              additionalProperties: true
+              description: Additional metadata associated with the incoming payment. (Optional)
           required:
-            - methods
-    public-incoming-payment:
-      title: Public Incoming Payment
-      description: An **incoming payment** resource with public details.
-      type: object
+            - walletAddress
+    incoming-payment-with-methods:
+      title: Incoming payment with a grant
+      description: An **incoming payment** resource with public and private details.
       examples:
-        - receivedAmount:
-            value: '0'
+        - id: 'https://ilp.interledger-test.dev/incoming-payments/2f1b0150-db73-49e8-8713-628baa4a17ff'
+          walletAddress: 'https://ilp.interledger-test.dev/alice/'
+          incomingAmount:
+            value: '2500'
             assetCode: USD
             assetScale: 2
-        - authServer: 'https://auth.ilp.interledger-test.dev'
-      properties:
-        receivedAmount:
-          $ref: '#/components/schemas/amount'
-        authServer:
-          type: string
-          format: uri
-          description: The URL of the authorization server endpoint for getting grants and access tokens for this wallet address.
-      required:
-        - authServer
+          receivedAmount:
+            value: '1234'
+            assetCode: USD
+            assetScale: 2
+          completed: false
+          expiresAt: '2022-04-12T23:20:50.52Z'
+          createdAt: '2022-03-12T23:20:50.52Z'
+          metadata:
+            description: Thanks for the flowers!
+            externalRef: INV-12876
+          methods:
+            - type: ilp
+              ilpAddress: g.ilp.iwuyge987y.98y08y
+              sharedSecret: 1c7eaXa4rd2fFOBl1iydvCT1tV5TbM3RW1WLCafu_JA
+      allOf:
+        - $ref: '#/components/schemas/public-incoming-payment-with-methods'
+        - $ref: '#/components/schemas/incoming-payment'
     outgoing-payment:
       title: Outgoing Payment
       description: 'An **outgoing payment** resource represents a payment that will be, is currently being, or has previously been, sent from the wallet address.'
