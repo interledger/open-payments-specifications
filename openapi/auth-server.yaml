@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments Authorization Server
-  version: '1.4.0'
+  version: '1.5.0'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -150,6 +150,33 @@ paths:
                             assetCode: USD
                             assetScale: 2
                   client: 'https://webmonize.com/.well-known/pay'
+                  interact:
+                    start:
+                      - redirect
+                    finish:
+                      method: redirect
+                      uri: 'https://webmonize.com/return/876FGRD8VC'
+                      nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
+              Grant request with client display information:
+                value:
+                  access_token:
+                    access:
+                      - type: outgoing-payment
+                        actions:
+                          - create
+                          - read
+                        identifier: 'https://ilp.interledger-test.dev/alice'
+                        limits:
+                          receiver: 'https://ilp.interledger-test.dev/incoming-payments/45a0d0ee-26dc-4c66-89e0-01fbf93156f7'
+                          debitAmount:
+                            value: '500'
+                            assetCode: USD
+                            assetScale: 2
+                  client:
+                    walletAddress: 'https://webmonize.com/.well-known/pay'
+                    display:
+                      name: Web Monize
+                      uri: 'https://webmonize.com'
                   interact:
                     start:
                       - redirect
@@ -653,7 +680,9 @@ components:
         When using the `jwk` property (directed identity approach):
         The client instance provides its public key directly in the request, eliminating the need for the AS to fetch it from a wallet address. This approach enhances privacy by not requiring the client to expose a persistent wallet address identifier. The `jwk` property can only be used for non-interactive grant requests (i.e.: incoming payments).
 
-        If sending a grant initiation request that requires RO interaction, the wallet address MUST serve necessary client display information.
+        Both object forms can include an optional `display` object with information about the client instance (`name`, `uri`). When `display` is present, the AS uses it when interacting with the RO. When it is absent, the AS uses the display information served by the client's wallet address. As in GNAP, `display` is supplied by the client and is not verified by the AS.
+
+        If sending a grant initiation request that requires RO interaction without `display`, the wallet address MUST serve necessary client display information.
       oneOf:
         - $ref: '#/components/schemas/client-wallet-address'
         - $ref: '#/components/schemas/client-directed-identity'
@@ -787,6 +816,8 @@ components:
           type: string
           format: uri
           description: Wallet address of the client instance that is making this request.
+        display:
+          $ref: '#/components/schemas/client-display'
       additionalProperties: false
     client-directed-identity:
       title: Directed identity (JWK)
@@ -795,6 +826,21 @@ components:
       properties:
         jwk:
           $ref: '#/components/schemas/json-web-key'
+        display:
+          $ref: '#/components/schemas/client-display'
+      additionalProperties: false
+    client-display:
+      title: Client display information
+      type: object
+      description: 'Information about the client instance that the AS shows to the RO during interaction ([RFC 9635 §2.3.2](https://www.rfc-editor.org/rfc/rfc9635#section-2.3.2)). It is supplied by the client and is not verified by the AS.'
+      properties:
+        name:
+          type: string
+          description: Display name of the client instance.
+        uri:
+          type: string
+          format: uri
+          description: URI of the homepage of the client instance.
       additionalProperties: false
     client-wallet-address-string:
       title: Wallet address string (deprecated)
