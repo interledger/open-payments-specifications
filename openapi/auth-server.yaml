@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments Authorization Server
-  version: '1.4.0'
+  version: '1.5.0'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -592,6 +592,30 @@ components:
         - type
         - actions
         - identifier
+      # A limit on the amount received alone is for card authorizations
+      # only: an access may not have one without `cardAuthorization`.
+      not:
+        required:
+          - limits
+        properties:
+          limits:
+            properties:
+              receiveAmount:
+                $ref: '#/components/schemas/amount'
+            required:
+              - receiveAmount
+            not:
+              properties:
+                debitAmount:
+                  $ref: '#/components/schemas/amount'
+              required:
+                - debitAmount
+        not:
+          properties:
+            cardAuthorization:
+              $ref: '#/components/schemas/card-authorization'
+          required:
+            - cardAuthorization
     access-quote:
       title: access-quote
       type: object
@@ -739,10 +763,11 @@ components:
         - 'R-1/P1Y2M10DT2H30M/2022-05-11T15:30:00Z'
     limits-outgoing:
       title: limits-outgoing
-      description: Open Payments specific property that defines the limits under which outgoing payments can be created.
+      description: 'Open Payments specific property that defines the limits under which outgoing payments can be created. The limits may name a `debitAmount`, or a `debitAmount` and a `receiveAmount`. A `receiveAmount` alone is allowed only on a card authorization (an access with `cardAuthorization`).'
       anyOf:
         - $ref: '#/components/schemas/limits-outgoing-no-amount'
         - $ref: '#/components/schemas/limits-outgoing-debit-amount'
+        - $ref: '#/components/schemas/limits-outgoing-debit-and-receive-amount'
         - $ref: '#/components/schemas/limits-outgoing-receive-amount'
     grant-request-with-access-token:
       title: with Access Token
@@ -823,8 +848,26 @@ components:
           $ref: '#/components/schemas/amount'
       required:
         - debitAmount
+    limits-outgoing-debit-and-receive-amount:
+      title: Debit and receive amount limit
+      type: object
+      properties:
+        receiver:
+          $ref: '#/components/schemas/receiver'
+        interval:
+          $ref: '#/components/schemas/interval'
+        debitAmount:
+          description: 'All amounts are maxima, i.e. multiple payments can be created under a grant as long as the total amounts of these payments do not exceed the maximum amount per interval as specified in the grant.'
+          $ref: '#/components/schemas/amount'
+        receiveAmount:
+          description: 'All amounts are maxima, i.e. multiple payments can be created under a grant as long as the total amounts of these payments do not exceed the maximum amount per interval as specified in the grant. A grant that limits the amount received also limits the amount debited, so `debitAmount` is required alongside it, except on a card authorization.'
+          $ref: '#/components/schemas/amount'
+      required:
+        - debitAmount
+        - receiveAmount
     limits-outgoing-receive-amount:
-      title: Receive amount limit
+      title: Receive amount limit (card authorization only)
+      description: "A limit on the amount received alone, without one on the amount debited. Only a card authorization may use it: the merchant knows the amount to receive but not the card's currency, and the cardholder consents to that amount."
       type: object
       properties:
         receiver:
