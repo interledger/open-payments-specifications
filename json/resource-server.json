@@ -1336,6 +1336,7 @@
       },
       "incoming-payment-base": {
         "title": "Incoming Payment Base",
+        "description": null,
         "x-internal-note": "An **incoming payment** resource without wallet address, payment methods and metadata.  This is the base schema for all incoming payments schemas.\n",
         "type": "object",
         "properties": {
@@ -1378,6 +1379,7 @@
       },
       "incoming-payment-base-with-methods": {
         "title": "Incoming Payment Base with payment methods",
+        "description": null,
         "x-internal-note": "An **incoming payment** resource with payment methods.  This is the base schema for authorized and unauthorized incoming payments schemas.\n",
         "allOf": [
           {

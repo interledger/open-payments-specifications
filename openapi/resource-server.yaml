@@ -923,6 +923,7 @@ components:
         - 'https://ilp.interledger-test.dev/incoming-payments/1'
     incoming-payment-base:
       title: Incoming Payment Base
+      description:
       x-internal-note: >
         An **incoming payment** resource without wallet address, payment methods and metadata. 
         This is the base schema for all incoming payments schemas.
@@ -958,6 +959,7 @@ components:
         - createdAt
     incoming-payment-base-with-methods:
       title: Incoming Payment Base with payment methods
+      description:
       x-internal-note: >
         An **incoming payment** resource with payment methods. 
         This is the base schema for authorized and unauthorized incoming payments schemas.
