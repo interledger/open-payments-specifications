@@ -923,7 +923,6 @@ components:
         - 'https://ilp.interledger-test.dev/incoming-payments/1'
     incoming-payment-base:
       title: Incoming Payment Base
-      description: ''
       x-internal-note: >
         An **incoming payment** resource without wallet address, payment methods and metadata. 
         This is the base schema for all incoming payments schemas.
@@ -959,7 +958,6 @@ components:
         - createdAt
     incoming-payment-base-with-methods:
       title: Incoming Payment Base with payment methods
-      description: ''
       x-internal-note: >
         An **incoming payment** resource with payment methods. 
         This is the base schema for authorized and unauthorized incoming payments schemas.
@@ -979,7 +977,6 @@ components:
             - methods
     incoming-payment-without-grant:
       title: Incoming payment without a grant
-      description: An **incoming payment** resource with public details and the authorization server for this wallet address.
       examples:
         - id: 'https://ilp.interledger-test.dev/incoming-payments/016da9d5-c9a4-4c80-a354-86b915a04ff8'
           incomingAmount:
@@ -1001,6 +998,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/incoming-payment-base-with-methods'
         - type: object
+          description: An **incoming payment** resource with public details and the authorization server for this wallet address.
           properties:
             authServer:
               type: string
@@ -1057,7 +1055,6 @@ components:
             - walletAddress
     incoming-payment-with-grant:
       title: Incoming payment with a grant
-      description: An **incoming payment** resource with all details and payment methods.
       examples:
         - id: 'https://ilp.interledger-test.dev/incoming-payments/2f1b0150-db73-49e8-8713-628baa4a17ff'
           walletAddress: 'https://ilp.interledger-test.dev/alice/'
@@ -1082,6 +1079,8 @@ components:
       allOf:
         - $ref: '#/components/schemas/incoming-payment-base-with-methods'
         - $ref: '#/components/schemas/incoming-payment'
+        - type: object
+          description: An **incoming payment** resource with all details and payment methods.
     outgoing-payment:
       title: Outgoing Payment
       description: 'An **outgoing payment** resource represents a payment that will be, is currently being, or has previously been, sent from the wallet address.'
