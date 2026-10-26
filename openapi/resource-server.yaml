@@ -975,8 +975,27 @@ components:
                   - $ref: '#/components/schemas/ilp-payment-method'
           required:
             - methods
+    incoming-payment-base-with-details:
+      title: Incoming Payment Base with details
+      x-internal-note: >
+        Wallet address and metadata for an incoming payment.
+        Shared by incoming-payment and incoming-payment-with-grant.
+      type: object
+      properties:
+        walletAddress:
+          type: string
+          format: uri
+          description: The URL of the wallet address this payment is being made into.
+          readOnly: true
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional metadata associated with the incoming payment. (Optional)
+      required:
+        - walletAddress
     incoming-payment-without-grant:
       title: Incoming payment without a grant
+      description: An **incoming payment** resource with public details and the authorization server for this wallet address.
       examples:
         - id: 'https://ilp.interledger-test.dev/incoming-payments/016da9d5-c9a4-4c80-a354-86b915a04ff8'
           incomingAmount:
@@ -998,7 +1017,6 @@ components:
       allOf:
         - $ref: '#/components/schemas/incoming-payment-base-with-methods'
         - type: object
-          description: An **incoming payment** resource with public details and the authorization server for this wallet address.
           properties:
             authServer:
               type: string
@@ -1040,21 +1058,10 @@ components:
           createdAt: '2022-03-12T23:20:50.52Z'
       allOf:
         - $ref: '#/components/schemas/incoming-payment-base'
-        - type: object
-          properties:
-            walletAddress:
-              type: string
-              format: uri
-              description: The URL of the wallet address this payment is being made into.
-              readOnly: true
-            metadata:
-              type: object
-              additionalProperties: true
-              description: Additional metadata associated with the incoming payment. (Optional)
-          required:
-            - walletAddress
+        - $ref: '#/components/schemas/incoming-payment-base-with-details'
     incoming-payment-with-grant:
       title: Incoming payment with a grant
+      description: An **incoming payment** resource with all details and payment methods.
       examples:
         - id: 'https://ilp.interledger-test.dev/incoming-payments/2f1b0150-db73-49e8-8713-628baa4a17ff'
           walletAddress: 'https://ilp.interledger-test.dev/alice/'
@@ -1078,9 +1085,7 @@ components:
               sharedSecret: 1c7eaXa4rd2fFOBl1iydvCT1tV5TbM3RW1WLCafu_JA
       allOf:
         - $ref: '#/components/schemas/incoming-payment-base-with-methods'
-        - $ref: '#/components/schemas/incoming-payment'
-        - type: object
-          description: An **incoming payment** resource with all details and payment methods.
+        - $ref: '#/components/schemas/incoming-payment-base-with-details'
     outgoing-payment:
       title: Outgoing Payment
       description: 'An **outgoing payment** resource represents a payment that will be, is currently being, or has previously been, sent from the wallet address.'
