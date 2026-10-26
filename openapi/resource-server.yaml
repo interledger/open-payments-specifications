@@ -41,7 +41,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/incoming-payment-with-methods'
+                $ref: '#/components/schemas/incoming-payment-with-grant'
               examples:
                 New Incoming Payment for $25:
                   value:
@@ -507,8 +507,8 @@ paths:
             application/json:
               schema:
                 anyOf:
-                  - $ref: '#/components/schemas/incoming-payment-with-methods'
-                  - $ref: '#/components/schemas/public-incoming-payment-with-auth-server'
+                  - $ref: '#/components/schemas/incoming-payment-with-grant'
+                  - $ref: '#/components/schemas/incoming-payment-without-grant'
               examples:
                 Incoming payment with a grant:
                   summary: Incoming payment with a grant
@@ -563,10 +563,9 @@ paths:
       parameters:
         - $ref: '#/components/parameters/optional-signature-input'
         - $ref: '#/components/parameters/optional-signature'
-      description: |-
+      description: >
         A client can fetch the latest state of an incoming payment to determine the amount received into the wallet address.
-
-        Without a grant, the response returns `id`, `completed`, `incomingAmount`, `receivedAmount`, `expiresAt`, `createdAt`, `methods`, and `authServer`. It does not return `walletAddress` or `metadata`.
+        Without a grant, the response returns a subset of the incoming payment fields.
     parameters:
       - $ref: '#/components/parameters/id'
   '/incoming-payments/{id}/complete':
@@ -922,9 +921,11 @@ components:
         - 'https://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
         - 'http://ilp.interledger-test.dev/incoming-payments/08394f02-7b7b-45e2-b645-51d04e7c330c'
         - 'https://ilp.interledger-test.dev/incoming-payments/1'
-    public-incoming-payment:
-      title: Public Incoming Payment
-      description: An **incoming payment** resource with public details.
+    incoming-payment-base:
+      title: Incoming Payment Base
+      description: >
+        An **incoming payment** resource without wallet address, payment methods and metadata. 
+        This is the base schema for all incoming payments schemas.
       type: object
       properties:
         id:
@@ -955,11 +956,13 @@ components:
         - completed
         - receivedAmount
         - createdAt
-    public-incoming-payment-with-methods:
-      title: Public Incoming Payment with payment methods
-      description: An **incoming payment** resource with public details and payment methods.
+    incoming-payment-base-with-methods:
+      title: Incoming Payment Base with payment methods
+      description: >
+        An **incoming payment** resource with payment methods. 
+        This is the base schema for authorized and unauthorized incoming payments schemas.
       allOf:
-        - $ref: '#/components/schemas/public-incoming-payment'
+        - $ref: '#/components/schemas/incoming-payment-base'
         - type: object
           properties:
             methods:
@@ -972,7 +975,7 @@ components:
                   - $ref: '#/components/schemas/ilp-payment-method'
           required:
             - methods
-    public-incoming-payment-with-auth-server:
+    incoming-payment-without-grant:
       title: Incoming payment without a grant
       description: An **incoming payment** resource with public details and the authorization server for this wallet address.
       examples:
@@ -994,7 +997,7 @@ components:
               ilpAddress: g.ilp.iwuyge987y.98y08y
               sharedSecret: 1c7eaXa4rd2fFOBl1iydvCT1tV5TbM3RW1WLCafu_JA
       allOf:
-        - $ref: '#/components/schemas/public-incoming-payment-with-methods'
+        - $ref: '#/components/schemas/incoming-payment-base-with-methods'
         - type: object
           properties:
             authServer:
@@ -1036,7 +1039,7 @@ components:
           expiresAt: '2022-04-12T23:20:50.52Z'
           createdAt: '2022-03-12T23:20:50.52Z'
       allOf:
-        - $ref: '#/components/schemas/public-incoming-payment'
+        - $ref: '#/components/schemas/incoming-payment-base'
         - type: object
           properties:
             walletAddress:
@@ -1050,9 +1053,9 @@ components:
               description: Additional metadata associated with the incoming payment. (Optional)
           required:
             - walletAddress
-    incoming-payment-with-methods:
+    incoming-payment-with-grant:
       title: Incoming payment with a grant
-      description: An **incoming payment** resource with public and private details.
+      description: An **incoming payment** resource with all details and payment methods.
       examples:
         - id: 'https://ilp.interledger-test.dev/incoming-payments/2f1b0150-db73-49e8-8713-628baa4a17ff'
           walletAddress: 'https://ilp.interledger-test.dev/alice/'
@@ -1075,7 +1078,7 @@ components:
               ilpAddress: g.ilp.iwuyge987y.98y08y
               sharedSecret: 1c7eaXa4rd2fFOBl1iydvCT1tV5TbM3RW1WLCafu_JA
       allOf:
-        - $ref: '#/components/schemas/public-incoming-payment-with-methods'
+        - $ref: '#/components/schemas/incoming-payment-base-with-methods'
         - $ref: '#/components/schemas/incoming-payment'
     outgoing-payment:
       title: Outgoing Payment
