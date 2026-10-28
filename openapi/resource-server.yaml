@@ -41,7 +41,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/incoming-payment-with-grant'
+                $ref: '#/components/schemas/incoming-payment-with-access-token'
               examples:
                 New Incoming Payment for $25:
                   value:
@@ -507,11 +507,11 @@ paths:
             application/json:
               schema:
                 anyOf:
-                  - $ref: '#/components/schemas/incoming-payment-with-grant'
-                  - $ref: '#/components/schemas/incoming-payment-without-grant'
+                  - $ref: '#/components/schemas/incoming-payment-with-access-token'
+                  - $ref: '#/components/schemas/incoming-payment-without-access-token'
               examples:
-                Incoming payment with a grant:
-                  summary: Incoming payment with a grant
+                Incoming payment with an access token:
+                  summary: Incoming payment with an access token
                   value:
                     id: 'https://ilp.interledger-test.dev/incoming-payments/2f1b0150-db73-49e8-8713-628baa4a17ff'
                     walletAddress: 'https://ilp.interledger-test.dev/alice/'
@@ -533,8 +533,8 @@ paths:
                       - type: ilp
                         ilpAddress: g.ilp.iwuyge987y.98y08y
                         sharedSecret: 1c7eaXa4rd2fFOBl1iydvCT1tV5TbM3RW1WLCafu_JA
-                Incoming payment without a grant:
-                  summary: Incoming payment without a grant
+                Incoming payment without an access token:
+                  summary: Incoming payment without an access token
                   value:
                     id: 'https://ilp.interledger-test.dev/incoming-payments/016da9d5-c9a4-4c80-a354-86b915a04ff8'
                     incomingAmount:
@@ -565,7 +565,7 @@ paths:
         - $ref: '#/components/parameters/optional-signature'
       description: >
         A client can fetch the latest state of an incoming payment to determine the amount received into the wallet address.
-        Without a grant, the response returns a subset of the incoming payment fields.
+        Without an access token, the response returns a subset of the incoming payment fields.
     parameters:
       - $ref: '#/components/parameters/id'
   '/incoming-payments/{id}/complete':
@@ -979,7 +979,7 @@ components:
       title: Incoming Payment Base with details
       x-internal-note: >
         Wallet address and metadata for an incoming payment.
-        Shared by incoming-payment and incoming-payment-with-grant.
+        Shared by incoming-payment and incoming-payment-with-access-token.
       type: object
       properties:
         walletAddress:
@@ -993,8 +993,8 @@ components:
           description: Additional metadata associated with the incoming payment. (Optional)
       required:
         - walletAddress
-    incoming-payment-without-grant:
-      title: Incoming payment without a grant
+    incoming-payment-without-access-token:
+      title: Incoming payment without an access token
       description: An **incoming payment** resource with public details and the authorization server for this wallet address.
       examples:
         - id: 'https://ilp.interledger-test.dev/incoming-payments/016da9d5-c9a4-4c80-a354-86b915a04ff8'
@@ -1059,8 +1059,8 @@ components:
       allOf:
         - $ref: '#/components/schemas/incoming-payment-base'
         - $ref: '#/components/schemas/incoming-payment-base-with-details'
-    incoming-payment-with-grant:
-      title: Incoming payment with a grant
+    incoming-payment-with-access-token:
+      title: Incoming payment with an access token
       description: An **incoming payment** resource with all details and payment methods.
       examples:
         - id: 'https://ilp.interledger-test.dev/incoming-payments/2f1b0150-db73-49e8-8713-628baa4a17ff'
