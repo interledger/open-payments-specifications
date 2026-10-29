@@ -980,19 +980,21 @@ components:
       x-internal-note: >
         Wallet address and metadata for an incoming payment.
         Shared by incoming-payment and incoming-payment-with-access-token.
-      type: object
-      properties:
-        walletAddress:
-          type: string
-          format: uri
-          description: The URL of the wallet address this payment is being made into.
-          readOnly: true
-        metadata:
-          type: object
-          additionalProperties: true
-          description: Additional metadata associated with the incoming payment. (Optional)
-      required:
-        - walletAddress
+      allOf:
+        - $ref: '#/components/schemas/incoming-payment-base'
+        - type: object
+          properties:
+            walletAddress:
+              type: string
+              format: uri
+              description: The URL of the wallet address this payment is being made into.
+              readOnly: true
+            metadata:
+              type: object
+              additionalProperties: true
+              description: Additional metadata associated with the incoming payment. (Optional)
+          required:
+            - walletAddress
     incoming-payment-without-access-token:
       title: Incoming payment without an access token
       description: An **incoming payment** resource with public details and the authorization server for this wallet address.
@@ -1057,7 +1059,6 @@ components:
           expiresAt: '2022-04-12T23:20:50.52Z'
           createdAt: '2022-03-12T23:20:50.52Z'
       allOf:
-        - $ref: '#/components/schemas/incoming-payment-base'
         - $ref: '#/components/schemas/incoming-payment-base-with-details'
     incoming-payment-with-access-token:
       title: Incoming payment with an access token

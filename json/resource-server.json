@@ -1409,22 +1409,29 @@
       "incoming-payment-base-with-details": {
         "title": "Incoming Payment Base with details",
         "x-internal-note": "Wallet address and metadata for an incoming payment. Shared by incoming-payment and incoming-payment-with-access-token.\n",
-        "type": "object",
-        "properties": {
-          "walletAddress": {
-            "type": "string",
-            "format": "uri",
-            "description": "The URL of the wallet address this payment is being made into.",
-            "readOnly": true
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/incoming-payment-base"
           },
-          "metadata": {
+          {
             "type": "object",
-            "additionalProperties": true,
-            "description": "Additional metadata associated with the incoming payment. (Optional)"
+            "properties": {
+              "walletAddress": {
+                "type": "string",
+                "format": "uri",
+                "description": "The URL of the wallet address this payment is being made into.",
+                "readOnly": true
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Additional metadata associated with the incoming payment. (Optional)"
+              }
+            },
+            "required": [
+              "walletAddress"
+            ]
           }
-        },
-        "required": [
-          "walletAddress"
         ]
       },
       "incoming-payment-without-access-token": {
@@ -1518,9 +1525,6 @@
           }
         ],
         "allOf": [
-          {
-            "$ref": "#/components/schemas/incoming-payment-base"
-          },
           {
             "$ref": "#/components/schemas/incoming-payment-base-with-details"
           }
