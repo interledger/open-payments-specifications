@@ -267,7 +267,8 @@
                       "walletAddress": "https://webmonize.com/.well-known/pay",
                       "display": {
                         "name": "Web Monize",
-                        "uri": "https://webmonize.com"
+                        "uri": "https://webmonize.com",
+                        "logo_uri": "https://webmonize.com/logo.png"
                       }
                     },
                     "interact": {
@@ -1026,7 +1027,7 @@
       },
       "client": {
         "title": "client",
-        "description": "Client identification for grant requests.\n\nWhen sending a non-continuation request to the AS, the client instance MUST identify itself by including the client field of the request and by signing the request.\n\nCan be either:\n- A wallet address string (backwards compatible format)\n- An object with either `jwk` (for directed identity) or `walletAddress` (mutually exclusive)\n\nWhen using a wallet address string or the `walletAddress` property:\nA JSON Web Key Set document, including the public key that the client instance will use to protect this request and any continuation requests at the AS and any user-facing information about the client instance used in interactions, MUST be available at the wallet address + `/jwks.json` url.\n\nWhen using the `jwk` property (directed identity approach):\nThe client instance provides its public key directly in the request, eliminating the need for the AS to fetch it from a wallet address. This approach enhances privacy by not requiring the client to expose a persistent wallet address identifier. The `jwk` property can only be used for non-interactive grant requests (i.e.: incoming payments).\n\nBoth object forms can include an optional `display` object with information about the client instance (`name`, `uri`). When `display` is present, the AS uses it when interacting with the RO. When it is absent, the AS uses the display information served by the client's wallet address. As in GNAP, `display` is supplied by the client and is not verified by the AS.\n\nIf sending a grant initiation request that requires RO interaction without `display`, the wallet address MUST serve necessary client display information.",
+        "description": "Client identification for grant requests.\n\nWhen sending a non-continuation request to the AS, the client instance MUST identify itself by including the client field of the request and by signing the request.\n\nCan be either:\n- A wallet address string (backwards compatible format)\n- An object with either `jwk` (for directed identity) or `walletAddress` (mutually exclusive)\n\nWhen using a wallet address string or the `walletAddress` property:\nA JSON Web Key Set document, including the public key that the client instance will use to protect this request and any continuation requests at the AS and any user-facing information about the client instance used in interactions, MUST be available at the wallet address + `/jwks.json` url.\n\nWhen using the `jwk` property (directed identity approach):\nThe client instance provides its public key directly in the request, eliminating the need for the AS to fetch it from a wallet address. This approach enhances privacy by not requiring the client to expose a persistent wallet address identifier. The `jwk` property can only be used for non-interactive grant requests (i.e.: incoming payments).\n\nBoth object forms can include an optional `display` object with information about the client instance (`name`, `uri`, `logo_uri`). When `display` is present, the AS uses it when interacting with the RO. When it is absent, the AS uses the display information served by the client's wallet address. As in GNAP, `display` is supplied by the client and is not verified by the AS.\n\nIf sending a grant initiation request that requires RO interaction without `display`, the wallet address MUST serve necessary client display information.",
         "oneOf": [
           {
             "$ref": "#/components/schemas/client-wallet-address"
@@ -1270,6 +1271,11 @@
             "type": "string",
             "format": "uri",
             "description": "URI of the homepage of the client instance."
+          },
+          "logo_uri": {
+            "type": "string",
+            "format": "uri",
+            "description": "Absolute URI of an image that represents the client software. The image can be passed by value with a `data:` URI that references an image media type."
           }
         },
         "additionalProperties": false
