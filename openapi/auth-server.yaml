@@ -684,10 +684,11 @@ components:
         Both object forms can include an optional `display` object with information about the client instance (`name`, `uri`, `logo_uri`). When `display` is present, the AS uses it when interacting with the RO. When it is absent, the AS uses the display information served by the client's wallet address. As in GNAP, `display` is supplied by the client and is not verified by the AS.
 
         If sending a grant initiation request that requires RO interaction without `display`, the wallet address MUST serve necessary client display information.
-      oneOf:
-        - $ref: '#/components/schemas/client-wallet-address'
-        - $ref: '#/components/schemas/client-directed-identity'
-        - $ref: '#/components/schemas/client-wallet-address-string'
+      allOf:
+        - oneOf:
+            - $ref: '#/components/schemas/client-wallet-address'
+            - $ref: '#/components/schemas/client-directed-identity'
+            - $ref: '#/components/schemas/client-wallet-address-string'
     continue:
       title: continue
       type: object
