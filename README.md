@@ -2,7 +2,7 @@
 
 ## What is Open Payments?
 
-Open Payments APIs are a collection of open API standards that can be implemented by account servicing entities (e.g. banks, digital wallet providers, and mobile money providers) to facilitate interoperability in the setup and completion of payments for different use cases including:
+Open Payments APIs are a collection of open API standards that can be implemented by financial service providers (e.g. banks, digital wallet providers, and mobile money providers) to facilitate interoperability in the setup and completion of payments for different use cases including:
 
 - [Web Monetization](https://webmonetization.org)
 - Tipping/Donations (low value/low friction)
