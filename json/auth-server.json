@@ -228,14 +228,14 @@
                         }
                       ]
                     },
-                    "client": "https://webmonize.com/.well-known/pay",
+                    "client": "https://webmonetization.org/.well-known/pay",
                     "interact": {
                       "start": [
                         "redirect"
                       ],
                       "finish": {
                         "method": "redirect",
-                        "uri": "https://webmonize.com/return/876FGRD8VC",
+                        "uri": "https://webmonetization.org/return/876FGRD8VC",
                         "nonce": "4edb2194-dbdf-46bb-9397-d5fd57b7c8a7"
                       }
                     }
@@ -264,11 +264,11 @@
                       ]
                     },
                     "client": {
-                      "walletAddress": "https://webmonize.com/.well-known/pay",
+                      "walletAddress": "https://webmonetization.org/.well-known/pay",
                       "display": {
-                        "name": "Web Monize",
-                        "uri": "https://webmonize.com",
-                        "logo_uri": "https://webmonize.com/logo.png"
+                        "name": "Web Monetization",
+                        "uri": "https://webmonetization.org",
+                        "logo_uri": "https://webmonetization.org/logo.png"
                       }
                     },
                     "interact": {
@@ -277,7 +277,7 @@
                       ],
                       "finish": {
                         "method": "redirect",
-                        "uri": "https://webmonize.com/return/876FGRD8VC",
+                        "uri": "https://webmonetization.org/return/876FGRD8VC",
                         "nonce": "4edb2194-dbdf-46bb-9397-d5fd57b7c8a7"
                       }
                     }
@@ -297,7 +297,7 @@
                         }
                       ]
                     },
-                    "client": "https://webmonize.com/.well-known/pay"
+                    "client": "https://webmonetization.org/.well-known/pay"
                   }
                 },
                 "Grant request with directed identity (JWK)": {
@@ -336,14 +336,14 @@
                         }
                       ]
                     },
-                    "client": "https://webmonize.com/.well-known/pay",
+                    "client": "https://webmonetization.org/.well-known/pay",
                     "interact": {
                       "start": [
                         "redirect"
                       ],
                       "finish": {
                         "method": "redirect",
-                        "uri": "https://webmonize.com/return/876FGRD8VC",
+                        "uri": "https://webmonetization.org/return/876FGRD8VC",
                         "nonce": "4edb2194-dbdf-46bb-9397-d5fd57b7c8a7"
                       }
                     }
@@ -381,7 +381,7 @@
                         }
                       ]
                     },
-                    "client": "https://webmonize.com/.well-known/pay"
+                    "client": "https://webmonetization.org/.well-known/pay"
                   }
                 },
                 "Grant request for a no-CVM card payment (no PIN)": {
@@ -410,7 +410,7 @@
                         }
                       ]
                     },
-                    "client": "https://webmonize.com/.well-known/pay"
+                    "client": "https://webmonetization.org/.well-known/pay"
                   }
                 }
               }

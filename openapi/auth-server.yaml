@@ -149,13 +149,13 @@ paths:
                             value: '500'
                             assetCode: USD
                             assetScale: 2
-                  client: 'https://webmonize.com/.well-known/pay'
+                  client: 'https://webmonetization.org/.well-known/pay'
                   interact:
                     start:
                       - redirect
                     finish:
                       method: redirect
-                      uri: 'https://webmonize.com/return/876FGRD8VC'
+                      uri: 'https://webmonetization.org/return/876FGRD8VC'
                       nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
               Grant request with client display information:
                 value:
@@ -173,17 +173,17 @@ paths:
                             assetCode: USD
                             assetScale: 2
                   client:
-                    walletAddress: 'https://webmonize.com/.well-known/pay'
+                    walletAddress: 'https://webmonetization.org/.well-known/pay'
                     display:
-                      name: Web Monize
-                      uri: 'https://webmonize.com'
-                      logo_uri: 'https://webmonize.com/logo.png'
+                      name: Web Monetization
+                      uri: 'https://webmonetization.org'
+                      logo_uri: 'https://webmonetization.org/logo.png'
                   interact:
                     start:
                       - redirect
                     finish:
                       method: redirect
-                      uri: 'https://webmonize.com/return/876FGRD8VC'
+                      uri: 'https://webmonetization.org/return/876FGRD8VC'
                       nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
               Grant request for creating and reading incoming payments:
                 value:
@@ -194,7 +194,7 @@ paths:
                           - create
                           - read
                         identifier: 'http://ilp.interledger-test.dev/bob'
-                  client: 'https://webmonize.com/.well-known/pay'
+                  client: 'https://webmonetization.org/.well-known/pay'
               Grant request with directed identity (JWK):
                 value:
                   access_token:
@@ -218,13 +218,13 @@ paths:
                     sub_ids:
                       - id: 'https://ilp.interledger-test.dev/alice'
                         format: 'uri'
-                  client: 'https://webmonize.com/.well-known/pay'
+                  client: 'https://webmonetization.org/.well-known/pay'
                   interact:
                     start:
                       - redirect
                     finish:
                       method: redirect
-                      uri: 'https://webmonize.com/return/876FGRD8VC'
+                      uri: 'https://webmonetization.org/return/876FGRD8VC'
                       nonce: 4edb2194-dbdf-46bb-9397-d5fd57b7c8a7
               Grant request for authorizing a card payment:
                 value:
@@ -249,7 +249,7 @@ paths:
                             kvc: A3F1C2
                             iv: '00000000000000000000000000000000'
                           requestId: 018f8d2e-3c1a-7b6e-9f0a-2c4d6e8f0a1b
-                  client: 'https://webmonize.com/.well-known/pay'
+                  client: 'https://webmonetization.org/.well-known/pay'
               Grant request for a no-CVM card payment (no PIN):
                 value:
                   access_token:
@@ -268,7 +268,7 @@ paths:
                         cardAuthorization:
                           tlvData: '9F26089F27019F1002...'
                           requestId: 018f8d31-9a2b-7c4d-8e1f-3b5d7f9a1c2e
-                  client: 'https://webmonize.com/.well-known/pay'
+                  client: 'https://webmonetization.org/.well-known/pay'
         description: ''
         required: true
       description: Make a new grant request
