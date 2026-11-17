@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Open Payments
-  version: '1.5.0'
+  version: '1.5.1'
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -91,15 +91,15 @@ paths:
       description: |-
         A client MUST create an **incoming payment** resource before it is possible to send any payments to the wallet address.
 
-        When a client creates an **incoming payment** the receiving Account Servicing Entity generates unique payment details that can be used to address payments to the account and returns these details to the client as properties of the new **incoming payment**. Any payments received using those details are then associated with the **incoming payment**.
+        When a client creates an **incoming payment** the receiving financial service provider generates unique payment details that can be used to address payments to the account and returns these details to the client as properties of the new **incoming payment**. Any payments received using those details are then associated with the **incoming payment**.
 
         All of the input parameters are _optional_.
 
         For example, the client could use the `metadata` property to store an external reference on the **incoming payment** and this can be shared with the account holder to assist with reconciliation.
 
-        If `incomingAmount` is specified and the total received using the payment details equals or exceeds the specified `incomingAmount`, then the receiving Account Servicing Entity MUST reject any further payments and set `completed` to `true`.
+        If `incomingAmount` is specified and the total received using the payment details equals or exceeds the specified `incomingAmount`, then the receiving financial service provider MUST reject any further payments and set `completed` to `true`.
 
-        If an `expiresAt` value is defined, and the current date and time on the receiving Account Servicing Entity's systems exceeds that value, the receiving Account Servicing Entity MUST reject any further payments.
+        If an `expiresAt` value is defined, and the current date and time on the receiving financial service provider's systems exceeds that value, the receiving financial service provider MUST reject any further payments.
       parameters:
         - $ref: '#/components/parameters/signature-input'
         - $ref: '#/components/parameters/signature'
@@ -285,7 +285,7 @@ paths:
       description: |-
         An **outgoing payment** is a sub-resource of a wallet address. It represents a payment from the wallet address.
 
-        Once created, it is already authorized and SHOULD be processed immediately. If payment fails, the Account Servicing Entity must mark the **outgoing payment** as `failed`.
+        Once created, it is already authorized and SHOULD be processed immediately. If payment fails, the financial service provider must mark the **outgoing payment** as `failed`.
       parameters:
         - $ref: '#/components/parameters/signature-input'
         - $ref: '#/components/parameters/signature'
@@ -611,7 +611,7 @@ paths:
       description: |-
         A client with the appropriate permissions MAY mark a non-expired **incoming payment** as `completed` indicating that the client is not going to make any further payments toward this **incoming payment**, even though the full `incomingAmount` may not have been received.
 
-        This indicates to the receiving Account Servicing Entity that it can begin any post processing of the payment such as generating account statements or notifying the account holder of the completed payment.
+        This indicates to the receiving financial service provider that it can begin any post processing of the payment such as generating account statements or notifying the account holder of the completed payment.
       parameters:
         - $ref: '#/components/parameters/signature-input'
         - $ref: '#/components/parameters/signature'
